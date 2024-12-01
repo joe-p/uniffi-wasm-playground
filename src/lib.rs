@@ -2,6 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+extern crate async_std;
+
+use async_std::future::{pending, timeout};
+use std::time::Duration;
+
 #[derive(Debug, thiserror::Error)]
 pub enum ArithmeticError {
     #[error("Integer overflow on an operation with {a} and {b}")]
@@ -27,6 +32,14 @@ fn div(dividend: u64, divisor: u64) -> u64 {
 
 fn equal(a: u64, b: u64) -> bool {
     a == b
+}
+
+pub async fn say_after(ms: u64, who: String) -> String {
+    println!("called say_after({ms}, {who})");
+    let never = pending::<()>();
+    timeout(Duration::from_millis(ms), never).await.unwrap_err();
+    println!("done say_after({ms}, {who})");
+    format!("Hello, {who}!")
 }
 
 type Result<T, E = ArithmeticError> = std::result::Result<T, E>;

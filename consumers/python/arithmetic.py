@@ -27,6 +27,7 @@ import threading
 import itertools
 import traceback
 import typing
+import asyncio
 import platform
 
 # Used for default argument values
@@ -466,6 +467,8 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_equal() != 25849:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_arithmetical_checksum_func_say_after() != 62868:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_sub() != 25090:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
 
@@ -592,6 +595,11 @@ _UniffiLib.uniffi_arithmetical_fn_func_equal.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_arithmetical_fn_func_equal.restype = ctypes.c_int8
+_UniffiLib.uniffi_arithmetical_fn_func_say_after.argtypes = (
+    ctypes.c_uint64,
+    _UniffiRustBuffer,
+)
+_UniffiLib.uniffi_arithmetical_fn_func_say_after.restype = ctypes.c_uint64
 _UniffiLib.uniffi_arithmetical_fn_func_sub.argtypes = (
     ctypes.c_uint64,
     ctypes.c_uint64,
@@ -875,6 +883,9 @@ _UniffiLib.uniffi_arithmetical_checksum_func_div.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.restype = ctypes.c_uint16
+_UniffiLib.uniffi_arithmetical_checksum_func_say_after.argtypes = (
+)
+_UniffiLib.uniffi_arithmetical_checksum_func_say_after.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_sub.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_sub.restype = ctypes.c_uint16
@@ -997,7 +1008,69 @@ class _UniffiConverterTypeArithmeticError(_UniffiConverterRustBuffer):
         if isinstance(value, ArithmeticError.IntegerOverflow):
             buf.write_i32(1)
 
-# Async support
+# Async support# RustFuturePoll values
+_UNIFFI_RUST_FUTURE_POLL_READY = 0
+_UNIFFI_RUST_FUTURE_POLL_MAYBE_READY = 1
+
+# Stores futures for _uniffi_continuation_callback
+_UniffiContinuationHandleMap = _UniffiHandleMap()
+
+_UNIFFI_GLOBAL_EVENT_LOOP = None
+
+"""
+Set the event loop to use for async functions
+
+This is needed if some async functions run outside of the eventloop, for example:
+    - A non-eventloop thread is spawned, maybe from `EventLoop.run_in_executor` or maybe from the
+      Rust code spawning its own thread.
+    - The Rust code calls an async callback method from a sync callback function, using something
+      like `pollster` to block on the async call.
+
+In this case, we need an event loop to run the Python async function, but there's no eventloop set
+for the thread.  Use `uniffi_set_event_loop` to force an eventloop to be used in this case.
+"""
+def uniffi_set_event_loop(eventloop: asyncio.BaseEventLoop):
+    global _UNIFFI_GLOBAL_EVENT_LOOP
+    _UNIFFI_GLOBAL_EVENT_LOOP = eventloop
+
+def _uniffi_get_event_loop():
+    if _UNIFFI_GLOBAL_EVENT_LOOP is not None:
+        return _UNIFFI_GLOBAL_EVENT_LOOP
+    else:
+        return asyncio.get_running_loop()
+
+# Continuation callback for async functions
+# lift the return value or error and resolve the future, causing the async function to resume.
+@_UNIFFI_RUST_FUTURE_CONTINUATION_CALLBACK
+def _uniffi_continuation_callback(future_ptr, poll_code):
+    (eventloop, future) = _UniffiContinuationHandleMap.remove(future_ptr)
+    eventloop.call_soon_threadsafe(_uniffi_set_future_result, future, poll_code)
+
+def _uniffi_set_future_result(future, poll_code):
+    if not future.cancelled():
+        future.set_result(poll_code)
+
+async def _uniffi_rust_call_async(rust_future, ffi_poll, ffi_complete, ffi_free, lift_func, error_ffi_converter):
+    try:
+        eventloop = _uniffi_get_event_loop()
+
+        # Loop and poll until we see a _UNIFFI_RUST_FUTURE_POLL_READY value
+        while True:
+            future = eventloop.create_future()
+            ffi_poll(
+                rust_future,
+                _uniffi_continuation_callback,
+                _UniffiContinuationHandleMap.insert((eventloop, future)),
+            )
+            poll_code = await future
+            if poll_code == _UNIFFI_RUST_FUTURE_POLL_READY:
+                break
+
+        return lift_func(
+            _uniffi_rust_call_with_error(error_ffi_converter, ffi_complete, rust_future)
+        )
+    finally:
+        ffi_free(rust_future)
 
 def add(a: "int",b: "int") -> "int":
     _UniffiConverterUInt64.check_lower(a)
@@ -1028,6 +1101,27 @@ def equal(a: "int",b: "int") -> "bool":
         _UniffiConverterUInt64.lower(a),
         _UniffiConverterUInt64.lower(b)))
 
+async def say_after(ms: "int",who: "str") -> "str":
+
+    _UniffiConverterUInt64.check_lower(ms)
+    
+    _UniffiConverterString.check_lower(who)
+    
+    return await _uniffi_rust_call_async(
+        _UniffiLib.uniffi_arithmetical_fn_func_say_after(
+        _UniffiConverterUInt64.lower(ms),
+        _UniffiConverterString.lower(who)),
+        _UniffiLib.ffi_arithmetical_rust_future_poll_rust_buffer,
+        _UniffiLib.ffi_arithmetical_rust_future_complete_rust_buffer,
+        _UniffiLib.ffi_arithmetical_rust_future_free_rust_buffer,
+        # lift function
+        _UniffiConverterString.lift,
+        
+    # Error FFI converter
+
+    None,
+
+    )
 
 def sub(a: "int",b: "int") -> "int":
     _UniffiConverterUInt64.check_lower(a)
@@ -1045,6 +1139,7 @@ __all__ = [
     "add",
     "div",
     "equal",
+    "say_after",
     "sub",
 ]
 
