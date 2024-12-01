@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 extern crate async_std;
-// extern crate surf;
+extern crate surf;
 
 use async_std::future::{pending, timeout};
 use std::time::Duration;
@@ -27,19 +27,22 @@ pub fn add(a: u64, b: u64) -> Result<u64, ArithmeticError> {
         .ok_or(ArithmeticError::IntegerOverflow { a, b })
 }
 
-fn sub(a: u64, b: u64) -> Result<u64, ArithmeticError> {
+#[wasm_bindgen]
+pub fn sub(a: u64, b: u64) -> Result<u64, ArithmeticError> {
     a.checked_sub(b)
         .ok_or(ArithmeticError::IntegerOverflow { a, b })
 }
 
-fn div(dividend: u64, divisor: u64) -> u64 {
+#[wasm_bindgen]
+pub fn div(dividend: u64, divisor: u64) -> u64 {
     if divisor == 0 {
         panic!("Can't divide by zero");
     }
     dividend / divisor
 }
 
-fn equal(a: u64, b: u64) -> bool {
+#[wasm_bindgen]
+pub fn equal(a: u64, b: u64) -> bool {
     a == b
 }
 
@@ -52,12 +55,13 @@ pub async fn say_after(ms: u64, who: String) -> String {
     format!("Hello, {who}!")
 }
 
-// pub async fn http_get(url: String) -> String {
-//     println!("called http_get({})", &url);
-//     let body = surf::get(&url).recv_string().await.unwrap();
+#[wasm_bindgen]
+pub async fn http_get(url: String) -> String {
+    println!("called http_get({})", &url);
+    let body = surf::get(&url).recv_string().await.unwrap();
 
-//     println!("done http_get({url})");
-//     body
-// }
+    println!("done http_get({url})");
+    body
+}
 
 // uniffi::include_scaffolding!("arithmetic");

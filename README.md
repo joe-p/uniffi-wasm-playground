@@ -29,9 +29,11 @@ For more information about UniFFI, see the [official documentation](https://mozi
 
 ## What's been tested
 
-- Basic FFI bindings (calling Rust functions from python)
-- Async FFI bindings (calling async Rust functions from python)
-- Error handling (Rust errors are propagated to python)
+| Feature                 | Python | Web |
+| ----------------------- | ------ | --- |
+| Basic FFI bindings      | ✅     | ✅  |
+| Async HTTP FFI bindings | ✅     | ✅  |
+| Error handling          | ✅     | ✅  |
 
 ## Building and using the python bindings
 
