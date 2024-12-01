@@ -18,7 +18,7 @@ For more information about UniFFI, see the [official documentation](https://mozi
 
 \* = Third-party bindings
 
-[wasm-bindgen](https://github.com/rustwasm/wasm-bindgen) could also be used in conjunction with UniFFI to target JS (node and web) as well.
+[wasm-pack](https://github.com/rustwasm/wasm-pack) could also be used in conjunction with UniFFI to target JS (node and web) as well.
 
 ## Key Files
 
@@ -47,6 +47,6 @@ Note that `uniffi-bindgen` only needs to be ran when we make changes to the UDL 
 
 ## TODO
 
-- [ ] Try to also integrate [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen) to target web assembly that can run in the browser
+- [ ] Try to also integrate [wasm-pack](https://github.com/rustwasm/wasm-pack) to target web assembly that can run in the browser
 - [ ] Test on Windows
 - [ ] Test on Linux
