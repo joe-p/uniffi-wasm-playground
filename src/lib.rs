@@ -14,12 +14,12 @@ pub enum ArithmeticError {
     IntegerOverflow { a: u64, b: u64 },
 }
 
-fn add(a: u64, b: u64) -> Result<u64> {
+pub fn add(a: u64, b: u64) -> Result<u64, ArithmeticError> {
     a.checked_add(b)
         .ok_or(ArithmeticError::IntegerOverflow { a, b })
 }
 
-fn sub(a: u64, b: u64) -> Result<u64> {
+fn sub(a: u64, b: u64) -> Result<u64, ArithmeticError> {
     a.checked_sub(b)
         .ok_or(ArithmeticError::IntegerOverflow { a, b })
 }
@@ -50,7 +50,5 @@ pub async fn http_get(url: String) -> String {
     println!("done http_get({url})");
     body
 }
-
-type Result<T, E = ArithmeticError> = std::result::Result<T, E>;
 
 uniffi::include_scaffolding!("arithmetic");
