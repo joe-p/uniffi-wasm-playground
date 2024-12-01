@@ -13,8 +13,10 @@ name = "arithmetical"
 uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli"] }
 thiserror = "1.0"
 async-std = "1.13.0"
-# https://github.com/rust-lang/cargo/issues/1197
-# surf = { version = "2.3.2", default-features = false, features = ["wasm-client"] }
+
+# The features of surf will get changed by build.py depending on if we're building for wasm or not
+# See https://github.com/rust-lang/cargo/issues/1197
+# If this is the only change in a commit, assume it's a mistake because build.py should always reset it
 surf = { version = "2.3.2" }
 
 wasm-bindgen = "0.2.97"
@@ -29,10 +31,8 @@ uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"
 uniffi = { version = "0.28.3", features = ["bindgen-tests"] }
 
 [patch.crates-io]
+# see https://github.com/koute/stdweb/issues/427#issuecomment-2510242651
 stdweb = { git = "https://github.com/Dampfwalze/stdweb/", rev = "a0086b4bd9b3116edeb679fe0ca477d48e06bb32" }
-
-[features]
-# ffi-trace = ["uniffi/ffi-trace"]
 
 [[bin]]
 # This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
