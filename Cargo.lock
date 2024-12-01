@@ -1786,6 +1786,7 @@ dependencies = [
  "thiserror",
  "uniffi",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]

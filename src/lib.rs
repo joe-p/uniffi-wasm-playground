@@ -43,6 +43,7 @@ fn equal(a: u64, b: u64) -> bool {
     a == b
 }
 
+#[wasm_bindgen]
 pub async fn say_after(ms: u64, who: String) -> String {
     println!("called say_after({ms}, {who})");
     let never = pending::<()>();
