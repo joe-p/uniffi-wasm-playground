@@ -27,7 +27,10 @@ async def main():
         f"https://testnet-api.4160.nodely.dev/v2/status/wait-for-block-after/{last_round + 1}"
     )
 
-    await asyncio.gather(round_1, round_3, round_5)
+    for future in asyncio.as_completed([round_1, round_3, round_5]):
+        last_round = json.loads(await future)["last-round"]
+
+        print(f"Got to round {last_round}")
 
 
 if __name__ == "__main__":
