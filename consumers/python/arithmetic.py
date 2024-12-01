@@ -467,6 +467,8 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_equal() != 25849:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_arithmetical_checksum_func_http_get() != 9582:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_say_after() != 62868:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_sub() != 25090:
@@ -595,6 +597,10 @@ _UniffiLib.uniffi_arithmetical_fn_func_equal.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_arithmetical_fn_func_equal.restype = ctypes.c_int8
+_UniffiLib.uniffi_arithmetical_fn_func_http_get.argtypes = (
+    _UniffiRustBuffer,
+)
+_UniffiLib.uniffi_arithmetical_fn_func_http_get.restype = ctypes.c_uint64
 _UniffiLib.uniffi_arithmetical_fn_func_say_after.argtypes = (
     ctypes.c_uint64,
     _UniffiRustBuffer,
@@ -883,6 +889,9 @@ _UniffiLib.uniffi_arithmetical_checksum_func_div.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.restype = ctypes.c_uint16
+_UniffiLib.uniffi_arithmetical_checksum_func_http_get.argtypes = (
+)
+_UniffiLib.uniffi_arithmetical_checksum_func_http_get.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_say_after.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_say_after.restype = ctypes.c_uint16
@@ -1101,6 +1110,24 @@ def equal(a: "int",b: "int") -> "bool":
         _UniffiConverterUInt64.lower(a),
         _UniffiConverterUInt64.lower(b)))
 
+async def http_get(url: "str") -> "str":
+
+    _UniffiConverterString.check_lower(url)
+    
+    return await _uniffi_rust_call_async(
+        _UniffiLib.uniffi_arithmetical_fn_func_http_get(
+        _UniffiConverterString.lower(url)),
+        _UniffiLib.ffi_arithmetical_rust_future_poll_rust_buffer,
+        _UniffiLib.ffi_arithmetical_rust_future_complete_rust_buffer,
+        _UniffiLib.ffi_arithmetical_rust_future_free_rust_buffer,
+        # lift function
+        _UniffiConverterString.lift,
+        
+    # Error FFI converter
+
+    None,
+
+    )
 async def say_after(ms: "int",who: "str") -> "str":
 
     _UniffiConverterUInt64.check_lower(ms)
@@ -1139,6 +1166,7 @@ __all__ = [
     "add",
     "div",
     "equal",
+    "http_get",
     "say_after",
     "sub",
 ]

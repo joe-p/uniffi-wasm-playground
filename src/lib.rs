@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 extern crate async_std;
+extern crate surf;
 
 use async_std::future::{pending, timeout};
 use std::time::Duration;
@@ -40,6 +41,14 @@ pub async fn say_after(ms: u64, who: String) -> String {
     timeout(Duration::from_millis(ms), never).await.unwrap_err();
     println!("done say_after({ms}, {who})");
     format!("Hello, {who}!")
+}
+
+pub async fn http_get(url: String) -> String {
+    println!("called http_get({})", &url);
+    let body = surf::get(&url).recv_string().await.unwrap();
+
+    println!("done http_get({url})");
+    body
 }
 
 type Result<T, E = ArithmeticError> = std::result::Result<T, E>;

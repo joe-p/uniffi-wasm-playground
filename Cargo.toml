@@ -13,6 +13,7 @@ name = "arithmetical"
 uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli"] }
 thiserror = "1.0"
 async-std = "1.13.0"
+surf = "2.3.2"
 
 [build-dependencies]
 # Add the "scaffolding-ffi-buffer-fns" feature to make sure things can build correctly
