@@ -13,7 +13,9 @@ name = "arithmetical"
 uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli"] }
 thiserror = "1.0"
 async-std = "1.13.0"
-surf = "2.3.2"
+surf = { version = "2.3.2", default-features = false, features = ["wasm-client"] }
+wasm-bindgen = "0.2.97"
+getrandom = { version = "0.2.15", features = ["js"] }
 
 [build-dependencies]
 # Add the "scaffolding-ffi-buffer-fns" feature to make sure things can build correctly
@@ -22,6 +24,9 @@ uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"
 [dev-dependencies]
 uniffi = { version = "0.28.3", features = ["bindgen-tests"] }
 
+[patch.crates-io]
+stdweb = { git = "https://github.com/Dampfwalze/stdweb/", rev = "a0086b4bd9b3116edeb679fe0ca477d48e06bb32" }
+
 [features]
 # ffi-trace = ["uniffi/ffi-trace"]
 
@@ -29,4 +34,3 @@ uniffi = { version = "0.28.3", features = ["bindgen-tests"] }
 # This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
 name = "uniffi-bindgen"
 path = "uniffi-bindgen.rs"
-

@@ -3,10 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 extern crate async_std;
-extern crate surf;
+// extern crate surf;
 
 use async_std::future::{pending, timeout};
 use std::time::Duration;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ArithmeticError {
@@ -14,6 +15,13 @@ pub enum ArithmeticError {
     IntegerOverflow { a: u64, b: u64 },
 }
 
+impl From<ArithmeticError> for wasm_bindgen::JsValue {
+    fn from(error: ArithmeticError) -> Self {
+        wasm_bindgen::JsValue::from_str(&error.to_string())
+    }
+}
+
+#[wasm_bindgen]
 pub fn add(a: u64, b: u64) -> Result<u64, ArithmeticError> {
     a.checked_add(b)
         .ok_or(ArithmeticError::IntegerOverflow { a, b })
@@ -43,12 +51,12 @@ pub async fn say_after(ms: u64, who: String) -> String {
     format!("Hello, {who}!")
 }
 
-pub async fn http_get(url: String) -> String {
-    println!("called http_get({})", &url);
-    let body = surf::get(&url).recv_string().await.unwrap();
+// pub async fn http_get(url: String) -> String {
+//     println!("called http_get({})", &url);
+//     let body = surf::get(&url).recv_string().await.unwrap();
 
-    println!("done http_get({url})");
-    body
-}
+//     println!("done http_get({url})");
+//     body
+// }
 
-uniffi::include_scaffolding!("arithmetic");
+// uniffi::include_scaffolding!("arithmetic");

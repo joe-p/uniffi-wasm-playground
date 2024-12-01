@@ -45,6 +45,14 @@ For more information about UniFFI, see the [official documentation](https://mozi
 
 Note that `uniffi-bindgen` only needs to be ran when we make changes to the UDL file. If you are just updating the Rust code, you simply need to build and then call the python script.
 
+## Building and using the web bindings
+
+1. `wasm-pack build --target web -d ./consumers/web/pkg`
+
+2. `cd consumers/web && python -m http.server`
+
+3. Open the webpage at `http://localhost:8000`
+
 ## TODO
 
 - [ ] Try to also integrate [wasm-pack](https://github.com/rustwasm/wasm-pack) to target web assembly that can run in the browser
