@@ -10,7 +10,7 @@ crate-type = ["lib", "cdylib"]
 name = "arithmetical"
 
 [dependencies]
-uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns"] }
+uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli"] }
 thiserror = "1.0"
 
 [build-dependencies]
@@ -22,3 +22,9 @@ uniffi = { version = "0.28.3", features = ["bindgen-tests"] }
 
 [features]
 # ffi-trace = ["uniffi/ffi-trace"]
+
+[[bin]]
+# This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+
