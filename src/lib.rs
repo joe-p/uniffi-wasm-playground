@@ -6,6 +6,8 @@ extern crate async_std;
 extern crate surf;
 
 use async_std::future::{pending, timeout};
+use ed25519_dalek::SigningKey;
+use rand::rngs::OsRng;
 use std::time::Duration;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -62,6 +64,13 @@ pub async fn http_get(url: String) -> String {
 
     println!("done http_get({url})");
     body
+}
+
+#[wasm_bindgen]
+pub fn genkey() -> Vec<u8> {
+    let mut csprng: OsRng = OsRng {};
+    let signing_key = SigningKey::generate(&mut csprng);
+    signing_key.to_bytes().to_vec()
 }
 
 #[cfg(not(target_arch = "wasm32"))]

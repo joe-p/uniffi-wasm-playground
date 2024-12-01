@@ -19,4 +19,6 @@ namespace arithmetic {
 
   [Async]
   string http_get(string url);
+
+  bytes genkey();
 };

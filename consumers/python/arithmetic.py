@@ -467,6 +467,8 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_equal() != 25849:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_arithmetical_checksum_func_genkey() != 44555:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_http_get() != 9582:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_say_after() != 62868:
@@ -597,6 +599,10 @@ _UniffiLib.uniffi_arithmetical_fn_func_equal.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_arithmetical_fn_func_equal.restype = ctypes.c_int8
+_UniffiLib.uniffi_arithmetical_fn_func_genkey.argtypes = (
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_arithmetical_fn_func_genkey.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_arithmetical_fn_func_http_get.argtypes = (
     _UniffiRustBuffer,
 )
@@ -889,6 +895,9 @@ _UniffiLib.uniffi_arithmetical_checksum_func_div.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.restype = ctypes.c_uint16
+_UniffiLib.uniffi_arithmetical_checksum_func_genkey.argtypes = (
+)
+_UniffiLib.uniffi_arithmetical_checksum_func_genkey.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_http_get.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_http_get.restype = ctypes.c_uint16
@@ -973,6 +982,26 @@ class _UniffiConverterString:
         with _UniffiRustBuffer.alloc_with_builder() as builder:
             builder.write(value.encode("utf-8"))
             return builder.finalize()
+
+class _UniffiConverterBytes(_UniffiConverterRustBuffer):
+    @staticmethod
+    def read(buf):
+        size = buf.read_i32()
+        if size < 0:
+            raise InternalError("Unexpected negative byte string length")
+        return buf.read(size)
+
+    @staticmethod
+    def check_lower(value):
+        try:
+            memoryview(value)
+        except TypeError:
+            raise TypeError("a bytes-like object is required, not {!r}".format(type(value).__name__))
+
+    @staticmethod
+    def write(value, buf):
+        buf.write_i32(len(value))
+        buf.write(value)
 
 
 # ArithmeticError
@@ -1110,6 +1139,10 @@ def equal(a: "int",b: "int") -> "bool":
         _UniffiConverterUInt64.lower(a),
         _UniffiConverterUInt64.lower(b)))
 
+
+def genkey() -> "bytes":
+    return _UniffiConverterBytes.lift(_uniffi_rust_call(_UniffiLib.uniffi_arithmetical_fn_func_genkey,))
+
 async def http_get(url: "str") -> "str":
 
     _UniffiConverterString.check_lower(url)
@@ -1166,6 +1199,7 @@ __all__ = [
     "add",
     "div",
     "equal",
+    "genkey",
     "http_get",
     "say_after",
     "sub",

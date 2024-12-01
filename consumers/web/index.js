@@ -1,9 +1,11 @@
-import init, { add, say_after, http_get, div } from "./pkg/arithmetical.js";
+import init, { add, say_after, http_get, div, genkey } from "./pkg/arithmetical.js";
 
 const MAX_U64 = BigInt("18446744073709551615")
 
 export async function main() {
     await init();
+
+    console.log("ed25519 key:", genkey())
     console.log(add(1n, 2n))
     const promises = [
         say_after(1000n, "Alice"),

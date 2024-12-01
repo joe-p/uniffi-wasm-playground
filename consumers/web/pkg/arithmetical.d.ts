@@ -6,6 +6,7 @@ export function div(dividend: bigint, divisor: bigint): bigint;
 export function equal(a: bigint, b: bigint): boolean;
 export function say_after(ms: bigint, who: string): Promise<string>;
 export function http_get(url: string): Promise<string>;
+export function genkey(): Uint8Array;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -17,6 +18,7 @@ export interface InitOutput {
   readonly equal: (a: bigint, b: bigint) => number;
   readonly say_after: (a: bigint, b: number, c: number) => any;
   readonly http_get: (a: number, b: number) => any;
+  readonly genkey: () => [number, number];
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly __externref_table_alloc: () => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
@@ -24,9 +26,10 @@ export interface InitOutput {
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __externref_table_dealloc: (a: number) => void;
-  readonly closure251_externref_shim: (a: number, b: number, c: any) => void;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly closure263_externref_shim: (a: number, b: number, c: any) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h382eebc988c99998: (a: number, b: number) => void;
-  readonly closure280_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure292_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 
