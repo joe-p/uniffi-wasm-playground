@@ -13,7 +13,10 @@ name = "arithmetical"
 uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli"] }
 thiserror = "1.0"
 async-std = "1.13.0"
-surf = { version = "2.3.2", default-features = false, features = ["wasm-client"] }
+# https://github.com/rust-lang/cargo/issues/1197
+# surf = { version = "2.3.2", default-features = false, features = ["wasm-client"] }
+surf = { version = "2.3.2" }
+
 wasm-bindgen = "0.2.97"
 getrandom = { version = "0.2.15", features = ["js"] }
 wasm-bindgen-futures = "0.4.47"

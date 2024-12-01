@@ -64,4 +64,5 @@ pub async fn http_get(url: String) -> String {
     body
 }
 
-// uniffi::include_scaffolding!("arithmetic");
+#[cfg(not(target_arch = "wasm32"))]
+uniffi::include_scaffolding!("arithmetic");
