@@ -1,39 +1,63 @@
-import init, { add, say_after, http_get, div, genkey } from "./pkg/arithmetical.js";
+import init, { add, http_get, div, genkey } from "./pkg/arithmetical.js";
 
-const MAX_U64 = BigInt("18446744073709551615")
+const MAX_U64 = BigInt("18446744073709551615");
 
 export async function main() {
-    await init();
+  await init();
 
-    console.log("ed25519 key:", genkey())
-    console.log(add(1n, 2n))
-    const promises = [
-        say_after(1000n, "Alice"),
-        say_after(500n, "Bob")
-    ]
-    promises.forEach(p => p.then(console.log))
+  // "Heavy" computation like key generation
+  print("ed25519 key:", genkey());
 
-    const result = await http_get("https://testnet-api.4160.nodely.dev/v2/status")
+  // Error handling
+  try {
+    div(1n, 0n);
+  } catch (e) {
+    console.log(`We caught a panic! ${e.name}: ${e.message}`);
+  }
 
-    console.log(result)
+  try {
+    const sum = add(MAX_U64 + 1n, 0n);
+    console.log(
+      `There was no error thrown by the binding! ${
+        MAX_U64 + 1n
+      } + ${0n} -- ${sum}`
+    );
+  } catch (e) {
+    console.log(
+      `We caught an error thrown by the binding! ${e.name}: ${e.message}`
+    );
+  }
 
-    http_get("https://httpbin.org/delay/3").then(() => console.log("3"))
-    http_get("https://httpbin.org/delay/2").then(() => console.log("2"))
-    http_get("https://httpbin.org/delay/1").then(() => console.log("1"))
+  try {
+    add(MAX_U64, 1n);
+  } catch (e) {
+    console.log(`We caught an error! ${e.name}: ${e.message}`);
+    console.log(`The error is just a string: ${e}`);
+  }
 
-    try {
-        div(100n, 0n)
-    } catch (e) {
-        console.log('We caught a panic!', e)
-    }
+  // Async HTTP requests
+  //     status = http_get("https://testnet-api.4160.nodely.dev/v2/status")
+  //     last_round = json.loads(await status)["last-round"]
+  //     print(f"Last round: {last_round}")
 
-    try {
-        add(MAX_U64, 1n)
-    } catch (e) {
-        console.log('We caught an error!', e)
-    }
+  //     async def delay(n):
+  //         await http_get(f"https://httpbin.org/delay/{n}")
+  //         print(f"Delay {n} finished")
 
-    // Note that the wasm binding does NOT check for overflows in args
-    const sum = add(MAX_U64 + 10n, 0n)
-    console.log('Says the sum is:', sum)
+  //     delay_2 = delay(2)
+  //     delay_1 = delay(1)
+
+  //     await asyncio.gather(delay_2, delay_1)
+  const status = http_get("https://testnet-api.4160.nodely.dev/v2/status");
+  const lastRound = JSON.parse(await status)["last-round"];
+  console.log(`Last round: ${lastRound}`);
+
+  const delay2 = http_get("https://httpbin.org/delay/2").then(() =>
+    console.log("Delay 2 finished")
+  );
+  const delay1 = http_get("https://httpbin.org/delay/1").then(() =>
+    console.log("Delay 1 finished")
+  );
+
+  await Promise.all([delay2, delay1]);
 }

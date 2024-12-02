@@ -1,5 +1,4 @@
 from arithmetic import (
-    say_after,
     http_get,
     genkey,
     add,
@@ -14,8 +13,10 @@ MAX_U64 = 18446744073709551615
 
 
 async def main():
+    # "Heavy" computation like key generation
     print("ed25519 key:", genkey())
 
+    # Error handling
     try:
         div(1, 0)
     except InternalError as e:
@@ -31,31 +32,19 @@ async def main():
     except ValueError as e:
         print(f"We caught an error thrown by the binding! {e.__class__.__name__}: {e}")
 
-    print(await say_after(50, "Alice"))
-    bob = say_after(100, "Bob")
-    chuck = say_after(50, "Chuck")
-    await asyncio.gather(bob, chuck)
+    # Async HTTP requests
     status = http_get("https://testnet-api.4160.nodely.dev/v2/status")
-    print("HERE!")
     last_round = json.loads(await status)["last-round"]
     print(f"Last round: {last_round}")
 
-    round_5 = http_get(
-        f"https://testnet-api.4160.nodely.dev/v2/status/wait-for-block-after/{last_round + 5}"
-    )
+    async def delay(n):
+        await http_get(f"https://httpbin.org/delay/{n}")
+        print(f"Delay {n} finished")
 
-    round_3 = http_get(
-        f"https://testnet-api.4160.nodely.dev/v2/status/wait-for-block-after/{last_round + 3}"
-    )
+    delay_2 = delay(2)
+    delay_1 = delay(1)
 
-    round_1 = http_get(
-        f"https://testnet-api.4160.nodely.dev/v2/status/wait-for-block-after/{last_round + 1}"
-    )
-
-    for future in asyncio.as_completed([round_1, round_3, round_5]):
-        last_round = json.loads(await future)["last-round"]
-
-        print(f"Got to round {last_round}")
+    await asyncio.gather(delay_2, delay_1)
 
 
 if __name__ == "__main__":
