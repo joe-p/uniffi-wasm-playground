@@ -11,8 +11,8 @@ use std::ffi::c_void;
 use std::time::Duration;
 use wasm_bindgen::prelude::wasm_bindgen;
 
+// We would ideally use rust-bindgen to generate this, but it doesn't work with wasm, so we have to handwrite the bindings for now
 mod falcon_ffi {
-    // We would ideally use rust-bindgen to generate this, but it doesn't work with wasm, so we have to handwrite the bindings for now
     #[repr(C)]
     #[derive(Debug, Copy, Clone)]
     pub struct shake256_context {
@@ -38,6 +38,8 @@ mod falcon_ffi {
 
 #[wasm_bindgen]
 pub struct FalconKeyPair {
+    // We need to tell wasm-bindgen that the TypeScript object will need to have getters for these fields
+    // Vec isn't Copy, so we need to use getter_with_clone which will make a clone of the Vec when returning it to JS
     #[wasm_bindgen(getter_with_clone)]
     pub public_key: Vec<u8>,
     #[wasm_bindgen(getter_with_clone)]
