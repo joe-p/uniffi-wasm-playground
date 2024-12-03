@@ -7,11 +7,23 @@ export function equal(a: bigint, b: bigint): boolean;
 export function say_after(ms: bigint, who: string): Promise<string>;
 export function http_get(url: string): Promise<string>;
 export function genkey(): Uint8Array;
+export function falcon_genkey(seed: Uint8Array): FalconKeyPair;
+export class FalconKeyPair {
+  private constructor();
+  free(): void;
+  public_key: Uint8Array;
+  private_key: Uint8Array;
+}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly __wbg_falconkeypair_free: (a: number, b: number) => void;
+  readonly __wbg_get_falconkeypair_public_key: (a: number) => [number, number];
+  readonly __wbg_set_falconkeypair_public_key: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_falconkeypair_private_key: (a: number) => [number, number];
+  readonly __wbg_set_falconkeypair_private_key: (a: number, b: number, c: number) => void;
   readonly add: (a: bigint, b: bigint) => [bigint, number, number];
   readonly sub: (a: bigint, b: bigint) => [bigint, number, number];
   readonly div: (a: bigint, b: bigint) => bigint;
@@ -19,17 +31,18 @@ export interface InitOutput {
   readonly say_after: (a: bigint, b: number, c: number) => any;
   readonly http_get: (a: number, b: number) => any;
   readonly genkey: () => [number, number];
+  readonly falcon_genkey: (a: number, b: number) => [number, number, number];
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly __externref_table_alloc: () => number;
   readonly __wbindgen_export_2: WebAssembly.Table;
   readonly __wbindgen_export_3: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-  readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly closure263_externref_shim: (a: number, b: number, c: any) => void;
-  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h382eebc988c99998: (a: number, b: number) => void;
-  readonly closure292_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly __externref_table_dealloc: (a: number) => void;
+  readonly closure256_externref_shim: (a: number, b: number, c: any) => void;
+  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h7a7c38ebe84af548: (a: number, b: number) => void;
+  readonly closure275_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

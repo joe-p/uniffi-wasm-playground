@@ -24,9 +24,14 @@ getrandom = { version = "0.2.15", features = ["js"] }
 wasm-bindgen-futures = "0.4.47"
 ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
 rand = "0.8.5"
+console_error_panic_hook = "0.1.7"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm32-unknown-unknown-openbsd-libc = "0.2"
 
 [build-dependencies]
 bindgen = "0.70.1"
+cc = "1.2.2"
 # Add the "scaffolding-ffi-buffer-fns" feature to make sure things can build correctly
 uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"] }
 

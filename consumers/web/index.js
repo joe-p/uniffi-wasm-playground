@@ -1,4 +1,10 @@
-import init, { add, http_get, div, genkey } from "./pkg/arithmetical.js";
+import init, {
+  add,
+  http_get,
+  div,
+  genkey,
+  falcon_genkey,
+} from "./pkg/arithmetical.js";
 
 const MAX_U64 = BigInt("18446744073709551615");
 
@@ -6,7 +12,13 @@ export async function main() {
   await init();
 
   // "Heavy" computation like key generation
-  print("ed25519 key:", genkey());
+  console.log("ed25519 key:", genkey());
+
+  // C -> Rust -> WASM -> JS
+  const keyPair = falcon_genkey(new Uint8Array());
+  console.log(keyPair);
+  console.log(keyPair.public_key);
+  console.log(keyPair.private_key);
 
   // Error handling
   try {

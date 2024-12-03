@@ -8,7 +8,28 @@
 
 extern crate async_std;
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+// We would ideally use rust-bindgen to generate this, but it doesn't work with wasm, so we have to handwrite the bindings for now
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct shake256_context {
+    pub opaque_contents: [u64; 26usize],
+}
+
+extern "C" {
+    pub fn falcon_det1024_keygen(
+        rng: *mut shake256_context,
+        privkey: *mut ::std::os::raw::c_void,
+        pubkey: *mut ::std::os::raw::c_void,
+    ) -> ::std::os::raw::c_int;
+}
+
+extern "C" {
+    pub fn shake256_init_prng_from_seed(
+        sc: *mut shake256_context,
+        seed: *const ::std::os::raw::c_void,
+        seed_len: usize,
+    );
+}
 
 use async_std::future::{pending, timeout};
 use ed25519_dalek::SigningKey;
@@ -17,8 +38,11 @@ use std::ffi::c_void;
 use std::time::Duration;
 use wasm_bindgen::prelude::wasm_bindgen;
 
+#[wasm_bindgen]
 pub struct FalconKeyPair {
+    #[wasm_bindgen(getter_with_clone)]
     pub public_key: Vec<u8>,
+    #[wasm_bindgen(getter_with_clone)]
     pub private_key: Vec<u8>,
 }
 
@@ -26,6 +50,12 @@ pub struct FalconKeyPair {
 pub enum FalconError {
     #[error("Falcon keygen failed with error code {0}")]
     FalconKeygenFailed(i32),
+}
+
+impl From<FalconError> for wasm_bindgen::JsValue {
+    fn from(error: FalconError) -> Self {
+        wasm_bindgen::JsValue::from_str(&error.to_string())
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -90,6 +120,7 @@ pub fn genkey() -> Vec<u8> {
     signing_key.to_bytes().to_vec()
 }
 
+#[wasm_bindgen]
 pub fn falcon_genkey(seed: Vec<u8>) -> Result<FalconKeyPair, FalconError> {
     const PUBLIC_KEY_SIZE: usize = 1793; // FALCON_DET1024_PUBKEY_SIZE
     const PRIVATE_KEY_SIZE: usize = 2305; // FALCON_DET1024_PRIVKEY_SIZE
