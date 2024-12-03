@@ -30,7 +30,6 @@ console_error_panic_hook = "0.1.7"
 wasm32-unknown-unknown-openbsd-libc = "0.2"
 
 [build-dependencies]
-bindgen = "0.70.1"
 cc = "1.2.2"
 # Add the "scaffolding-ffi-buffer-fns" feature to make sure things can build correctly
 uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"] }

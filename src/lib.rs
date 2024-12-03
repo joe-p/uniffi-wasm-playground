@@ -2,34 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-
 extern crate async_std;
-
-// We would ideally use rust-bindgen to generate this, but it doesn't work with wasm, so we have to handwrite the bindings for now
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct shake256_context {
-    pub opaque_contents: [u64; 26usize],
-}
-
-extern "C" {
-    pub fn falcon_det1024_keygen(
-        rng: *mut shake256_context,
-        privkey: *mut ::std::os::raw::c_void,
-        pubkey: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-}
-
-extern "C" {
-    pub fn shake256_init_prng_from_seed(
-        sc: *mut shake256_context,
-        seed: *const ::std::os::raw::c_void,
-        seed_len: usize,
-    );
-}
 
 use async_std::future::{pending, timeout};
 use ed25519_dalek::SigningKey;
@@ -37,6 +10,31 @@ use rand::rngs::OsRng;
 use std::ffi::c_void;
 use std::time::Duration;
 use wasm_bindgen::prelude::wasm_bindgen;
+
+mod falcon_ffi {
+    // We would ideally use rust-bindgen to generate this, but it doesn't work with wasm, so we have to handwrite the bindings for now
+    #[repr(C)]
+    #[derive(Debug, Copy, Clone)]
+    pub struct shake256_context {
+        pub opaque_contents: [u64; 26usize],
+    }
+
+    extern "C" {
+        pub fn falcon_det1024_keygen(
+            rng: *mut shake256_context,
+            privkey: *mut ::std::os::raw::c_void,
+            pubkey: *mut ::std::os::raw::c_void,
+        ) -> ::std::os::raw::c_int;
+    }
+
+    extern "C" {
+        pub fn shake256_init_prng_from_seed(
+            sc: *mut shake256_context,
+            seed: *const ::std::os::raw::c_void,
+            seed_len: usize,
+        );
+    }
+}
 
 #[wasm_bindgen]
 pub struct FalconKeyPair {
@@ -131,20 +129,20 @@ pub fn falcon_genkey(seed: Vec<u8>) -> Result<FalconKeyPair, FalconError> {
     let result = unsafe {
         if seed.is_empty() {
             let mut rng = std::mem::zeroed();
-            shake256_init_prng_from_seed(&mut rng, std::ptr::null(), 0);
-            falcon_det1024_keygen(
+            falcon_ffi::shake256_init_prng_from_seed(&mut rng, std::ptr::null(), 0);
+            falcon_ffi::falcon_det1024_keygen(
                 &mut rng,
                 private_key.as_mut_ptr() as *mut c_void,
                 public_key.as_mut_ptr() as *mut c_void,
             )
         } else {
             let mut rng = std::mem::zeroed();
-            shake256_init_prng_from_seed(
+            falcon_ffi::shake256_init_prng_from_seed(
                 &mut rng,
                 seed.as_ptr() as *const c_void,
                 seed.len() as usize,
             );
-            falcon_det1024_keygen(
+            falcon_ffi::falcon_det1024_keygen(
                 &mut rng,
                 private_key.as_mut_ptr() as *mut c_void,
                 public_key.as_mut_ptr() as *mut c_void,
