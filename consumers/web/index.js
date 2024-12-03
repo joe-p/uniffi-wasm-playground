@@ -16,7 +16,7 @@ export async function main() {
 
   // C -> Rust -> WASM -> JS
   const keyPair = falcon_genkey(new Uint8Array());
-  console.log("falcon keypair object (wasm ptr)", keyPair);
+  console.log("falcon keypair object", keyPair);
   console.log("falcon public key", keyPair.public_key);
   console.log("falcon private key", keyPair.private_key);
 

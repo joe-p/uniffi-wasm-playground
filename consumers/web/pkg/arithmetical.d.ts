@@ -8,22 +8,16 @@ export function say_after(ms: bigint, who: string): Promise<string>;
 export function http_get(url: string): Promise<string>;
 export function genkey(): Uint8Array;
 export function falcon_genkey(seed: Uint8Array): FalconKeyPair;
-export class FalconKeyPair {
-  private constructor();
-  free(): void;
-  public_key: Uint8Array;
-  private_key: Uint8Array;
+export interface FalconKeyPair {
+    public_key: number[];
+    private_key: number[];
 }
+
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_falconkeypair_free: (a: number, b: number) => void;
-  readonly __wbg_get_falconkeypair_public_key: (a: number) => [number, number];
-  readonly __wbg_set_falconkeypair_public_key: (a: number, b: number, c: number) => void;
-  readonly __wbg_get_falconkeypair_private_key: (a: number) => [number, number];
-  readonly __wbg_set_falconkeypair_private_key: (a: number, b: number, c: number) => void;
   readonly add: (a: bigint, b: bigint) => [bigint, number, number];
   readonly sub: (a: bigint, b: bigint) => [bigint, number, number];
   readonly div: (a: bigint, b: bigint) => bigint;
@@ -38,11 +32,11 @@ export interface InitOutput {
   readonly __wbindgen_export_3: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __externref_table_dealloc: (a: number) => void;
-  readonly closure264_externref_shim: (a: number, b: number, c: any) => void;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly closure261_externref_shim: (a: number, b: number, c: any) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h382eebc988c99998: (a: number, b: number) => void;
-  readonly closure293_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure290_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

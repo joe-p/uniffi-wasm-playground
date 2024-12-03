@@ -7,8 +7,10 @@ extern crate async_std;
 use async_std::future::{pending, timeout};
 use ed25519_dalek::SigningKey;
 use rand::rngs::OsRng;
+use serde::{Deserialize, Serialize};
 use std::ffi::c_void;
 use std::time::Duration;
+use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 // We would ideally use rust-bindgen to generate this, but it doesn't work with wasm, so we have to handwrite the bindings for now
@@ -36,13 +38,13 @@ mod falcon_ffi {
     }
 }
 
-#[wasm_bindgen]
+// If we weren't using tsify here, we'd have to wasm_bindgen(getter_with_clone) for each field
+// This would result in the returned object being a WASM pointer which could be confusing for consumers of the JS lib
+// It also gives us a better type definition in the resulting .d.ts file
+#[derive(Tsify, Serialize, Deserialize)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct FalconKeyPair {
-    // We need to tell wasm-bindgen that the TypeScript object will need to have getters for these fields
-    // Vec isn't Copy, so we need to use getter_with_clone which will make a clone of the Vec when returning it to JS
-    #[wasm_bindgen(getter_with_clone)]
     pub public_key: Vec<u8>,
-    #[wasm_bindgen(getter_with_clone)]
     pub private_key: Vec<u8>,
 }
 

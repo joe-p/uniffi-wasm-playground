@@ -26,6 +26,11 @@ ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
 rand = "0.8.5"
 console_error_panic_hook = "0.1.7"
 
+# tsify with serde uses serde-wasm-bindgen under the hood to convert structs to TS types
+# This makes life easier when writing rust and makes the dev experience better for JS consumers
+tsify = { version = "0.4.5", features = ["js"] }
+serde = "1.0.215"
+
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm32-unknown-unknown-openbsd-libc = "0.2"
 
