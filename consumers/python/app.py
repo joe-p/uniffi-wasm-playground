@@ -41,14 +41,16 @@ async def main():
     last_round = json.loads(await status)["last-round"]
     print(f"Last round: {last_round}")
 
-    async def delay(n):
-        await http_get(f"https://httpbin.org/delay/{n}")
-        print(f"Delay {n} finished")
+    async def wait_for_round(n):
+        await http_get(
+            f"https://testnet-api.4160.nodely.dev/v2/status/wait-for-block-after/{n}"
+        )
+        print(f"Got to round {n}!")
 
-    delay_2 = delay(2)
-    delay_1 = delay(1)
+    round_2 = wait_for_round(last_round + 2)
+    round_1 = wait_for_round(last_round + 1)
 
-    await asyncio.gather(delay_2, delay_1)
+    await asyncio.gather(round_2, round_1)
 
 
 if __name__ == "__main__":

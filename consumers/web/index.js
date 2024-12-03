@@ -47,29 +47,21 @@ export async function main() {
     console.log(`The error is just a string: ${e}`);
   }
 
-  // Async HTTP requests
-  //     status = http_get("https://testnet-api.4160.nodely.dev/v2/status")
-  //     last_round = json.loads(await status)["last-round"]
-  //     print(f"Last round: {last_round}")
-
-  //     async def delay(n):
-  //         await http_get(f"https://httpbin.org/delay/{n}")
-  //         print(f"Delay {n} finished")
-
-  //     delay_2 = delay(2)
-  //     delay_1 = delay(1)
-
-  //     await asyncio.gather(delay_2, delay_1)
   const status = http_get("https://testnet-api.4160.nodely.dev/v2/status");
   const lastRound = JSON.parse(await status)["last-round"];
   console.log(`Last round: ${lastRound}`);
 
-  const delay2 = http_get("https://httpbin.org/delay/2").then(() =>
-    console.log("Delay 2 finished")
-  );
-  const delay1 = http_get("https://httpbin.org/delay/1").then(() =>
-    console.log("Delay 1 finished")
-  );
+  const round2 = http_get(
+    `https://testnet-api.4160.nodely.dev/v2/status/wait-for-block-after/${
+      lastRound + 2
+    }`
+  ).then(() => console.log(`Got to round ${lastRound + 2}`));
 
-  await Promise.all([delay2, delay1]);
+  const round1 = http_get(
+    `https://testnet-api.4160.nodely.dev/v2/status/wait-for-block-after/${
+      lastRound + 1
+    }`
+  ).then(() => console.log(`Got to round ${lastRound + 1}`));
+
+  await Promise.all([round2, round1]);
 }
