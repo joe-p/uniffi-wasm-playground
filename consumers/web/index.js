@@ -35,15 +35,12 @@ export async function main() {
       } + ${100n} == ${sum}`
     );
   } catch (e) {
-    console.log(
-      `We caught an error thrown by the binding! ${e.name}: ${e.message}`
-    );
+    console.log(`We caught an error thrown by the binding! ${e}`);
   }
 
   try {
     add(MAX_U64, 1n);
   } catch (e) {
-    console.log(`We caught an error! ${e.name}: ${e.message}`);
     console.log(`The error is just a string: ${e}`);
   }
 
