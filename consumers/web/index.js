@@ -28,11 +28,11 @@ export async function main() {
   }
 
   try {
-    const sum = add(MAX_U64 + 1n, 0n);
+    const sum = add(MAX_U64 + 100n, 0n);
     console.log(
       `There was no error thrown by the binding! ${
         MAX_U64 + 1n
-      } + ${0n} -- ${sum}`
+      } + ${100n} == ${sum}`
     );
   } catch (e) {
     console.log(
