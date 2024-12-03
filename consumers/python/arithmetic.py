@@ -467,6 +467,8 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_equal() != 25849:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_arithmetical_checksum_func_falcon_genkey() != 26844:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_genkey() != 44555:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_arithmetical_checksum_func_http_get() != 9582:
@@ -599,6 +601,11 @@ _UniffiLib.uniffi_arithmetical_fn_func_equal.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_arithmetical_fn_func_equal.restype = ctypes.c_int8
+_UniffiLib.uniffi_arithmetical_fn_func_falcon_genkey.argtypes = (
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_arithmetical_fn_func_falcon_genkey.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_arithmetical_fn_func_genkey.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
@@ -895,6 +902,9 @@ _UniffiLib.uniffi_arithmetical_checksum_func_div.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_equal.restype = ctypes.c_uint16
+_UniffiLib.uniffi_arithmetical_checksum_func_falcon_genkey.argtypes = (
+)
+_UniffiLib.uniffi_arithmetical_checksum_func_falcon_genkey.restype = ctypes.c_uint16
 _UniffiLib.uniffi_arithmetical_checksum_func_genkey.argtypes = (
 )
 _UniffiLib.uniffi_arithmetical_checksum_func_genkey.restype = ctypes.c_uint16
@@ -1004,6 +1014,42 @@ class _UniffiConverterBytes(_UniffiConverterRustBuffer):
         buf.write(value)
 
 
+class FalconKeyPair:
+    public_key: "bytes"
+    private_key: "bytes"
+    def __init__(self, *, public_key: "bytes", private_key: "bytes"):
+        self.public_key = public_key
+        self.private_key = private_key
+
+    def __str__(self):
+        return "FalconKeyPair(public_key={}, private_key={})".format(self.public_key, self.private_key)
+
+    def __eq__(self, other):
+        if self.public_key != other.public_key:
+            return False
+        if self.private_key != other.private_key:
+            return False
+        return True
+
+class _UniffiConverterTypeFalconKeyPair(_UniffiConverterRustBuffer):
+    @staticmethod
+    def read(buf):
+        return FalconKeyPair(
+            public_key=_UniffiConverterBytes.read(buf),
+            private_key=_UniffiConverterBytes.read(buf),
+        )
+
+    @staticmethod
+    def check_lower(value):
+        _UniffiConverterBytes.check_lower(value.public_key)
+        _UniffiConverterBytes.check_lower(value.private_key)
+
+    @staticmethod
+    def write(value, buf):
+        _UniffiConverterBytes.write(value.public_key, buf)
+        _UniffiConverterBytes.write(value.private_key, buf)
+
+
 # ArithmeticError
 # We want to define each variant as a nested class that's also a subclass,
 # which is tricky in Python.  To accomplish this we're going to create each
@@ -1044,6 +1090,49 @@ class _UniffiConverterTypeArithmeticError(_UniffiConverterRustBuffer):
     @staticmethod
     def write(value, buf):
         if isinstance(value, ArithmeticError.IntegerOverflow):
+            buf.write_i32(1)
+
+
+# FalconError
+# We want to define each variant as a nested class that's also a subclass,
+# which is tricky in Python.  To accomplish this we're going to create each
+# class separately, then manually add the child classes to the base class's
+# __dict__.  All of this happens in dummy class to avoid polluting the module
+# namespace.
+class FalconError(Exception):
+    pass
+
+_UniffiTempFalconError = FalconError
+
+class FalconError:  # type: ignore
+    class FalconKeygenFailed(_UniffiTempFalconError):
+
+        def __repr__(self):
+            return "FalconError.FalconKeygenFailed({})".format(repr(str(self)))
+    _UniffiTempFalconError.FalconKeygenFailed = FalconKeygenFailed # type: ignore
+
+FalconError = _UniffiTempFalconError # type: ignore
+del _UniffiTempFalconError
+
+
+class _UniffiConverterTypeFalconError(_UniffiConverterRustBuffer):
+    @staticmethod
+    def read(buf):
+        variant = buf.read_i32()
+        if variant == 1:
+            return FalconError.FalconKeygenFailed(
+                _UniffiConverterString.read(buf),
+            )
+        raise InternalError("Raw enum value doesn't match any cases")
+
+    @staticmethod
+    def check_lower(value):
+        if isinstance(value, FalconError.FalconKeygenFailed):
+            return
+
+    @staticmethod
+    def write(value, buf):
+        if isinstance(value, FalconError.FalconKeygenFailed):
             buf.write_i32(1)
 
 # Async support# RustFuturePoll values
@@ -1140,6 +1229,13 @@ def equal(a: "int",b: "int") -> "bool":
         _UniffiConverterUInt64.lower(b)))
 
 
+def falcon_genkey(seed: "bytes") -> "FalconKeyPair":
+    _UniffiConverterBytes.check_lower(seed)
+    
+    return _UniffiConverterTypeFalconKeyPair.lift(_uniffi_rust_call_with_error(_UniffiConverterTypeFalconError,_UniffiLib.uniffi_arithmetical_fn_func_falcon_genkey,
+        _UniffiConverterBytes.lower(seed)))
+
+
 def genkey() -> "bytes":
     return _UniffiConverterBytes.lift(_uniffi_rust_call(_UniffiLib.uniffi_arithmetical_fn_func_genkey,))
 
@@ -1196,9 +1292,12 @@ def sub(a: "int",b: "int") -> "int":
 __all__ = [
     "InternalError",
     "ArithmeticError",
+    "FalconError",
+    "FalconKeyPair",
     "add",
     "div",
     "equal",
+    "falcon_genkey",
     "genkey",
     "http_get",
     "say_after",

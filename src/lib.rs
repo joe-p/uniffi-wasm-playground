@@ -2,14 +2,31 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+
 extern crate async_std;
-extern crate surf;
+
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 use async_std::future::{pending, timeout};
 use ed25519_dalek::SigningKey;
 use rand::rngs::OsRng;
+use std::ffi::c_void;
 use std::time::Duration;
 use wasm_bindgen::prelude::wasm_bindgen;
+
+pub struct FalconKeyPair {
+    pub public_key: Vec<u8>,
+    pub private_key: Vec<u8>,
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum FalconError {
+    #[error("Falcon keygen failed with error code {0}")]
+    FalconKeygenFailed(i32),
+}
 
 #[derive(Debug, thiserror::Error)]
 pub enum ArithmeticError {
@@ -71,6 +88,47 @@ pub fn genkey() -> Vec<u8> {
     let mut csprng: OsRng = OsRng {};
     let signing_key = SigningKey::generate(&mut csprng);
     signing_key.to_bytes().to_vec()
+}
+
+pub fn falcon_genkey(seed: Vec<u8>) -> Result<FalconKeyPair, FalconError> {
+    const PUBLIC_KEY_SIZE: usize = 1793; // FALCON_DET1024_PUBKEY_SIZE
+    const PRIVATE_KEY_SIZE: usize = 2305; // FALCON_DET1024_PRIVKEY_SIZE
+
+    let mut public_key = vec![0u8; PUBLIC_KEY_SIZE];
+    let mut private_key = vec![0u8; PRIVATE_KEY_SIZE];
+
+    let result = unsafe {
+        if seed.is_empty() {
+            let mut rng = std::mem::zeroed();
+            shake256_init_prng_from_seed(&mut rng, std::ptr::null(), 0);
+            falcon_det1024_keygen(
+                &mut rng,
+                private_key.as_mut_ptr() as *mut c_void,
+                public_key.as_mut_ptr() as *mut c_void,
+            )
+        } else {
+            let mut rng = std::mem::zeroed();
+            shake256_init_prng_from_seed(
+                &mut rng,
+                seed.as_ptr() as *const c_void,
+                seed.len() as usize,
+            );
+            falcon_det1024_keygen(
+                &mut rng,
+                private_key.as_mut_ptr() as *mut c_void,
+                public_key.as_mut_ptr() as *mut c_void,
+            )
+        }
+    };
+
+    if result != 0 {
+        return Err(FalconError::FalconKeygenFailed(result));
+    }
+
+    Ok(FalconKeyPair {
+        public_key,
+        private_key,
+    })
 }
 
 #[cfg(not(target_arch = "wasm32"))]

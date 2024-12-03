@@ -3,6 +3,17 @@ enum ArithmeticError {
   "IntegerOverflow",
 };
 
+[Error]
+enum FalconError {
+  "FalconKeygenFailed",
+};
+
+dictionary FalconKeyPair {
+    bytes public_key;
+    bytes private_key;
+};
+
+
 namespace arithmetic {
   [Throws=ArithmeticError]
   u64 add(u64 a, u64 b);
@@ -21,4 +32,7 @@ namespace arithmetic {
   string http_get(string url);
 
   bytes genkey();
+
+  [Throws=FalconError]
+  FalconKeyPair falcon_genkey(bytes seed);
 };

@@ -26,6 +26,7 @@ ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
 rand = "0.8.5"
 
 [build-dependencies]
+bindgen = "0.70.1"
 # Add the "scaffolding-ffi-buffer-fns" feature to make sure things can build correctly
 uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"] }
 

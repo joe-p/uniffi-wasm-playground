@@ -5,6 +5,7 @@ from arithmetic import (
     div,
     ArithmeticError,
     InternalError,
+    falcon_genkey,
 )
 import asyncio
 import json
@@ -15,6 +16,9 @@ MAX_U64 = 18446744073709551615
 async def main():
     # "Heavy" computation like key generation
     print("ed25519 key:", genkey())
+
+    # Py -> Rust -> C for falcon
+    print("falcon key:", falcon_genkey(b"").public_key)
 
     # Error handling
     try:
