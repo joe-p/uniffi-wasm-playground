@@ -36,6 +36,7 @@ For more information about UniFFI, see the [official documentation](https://mozi
 | Basic FFI bindings      | ✅     | ✅  |
 | Async HTTP FFI bindings | ✅     | ✅  |
 | Error handling          | ✅     | ✅  |
+| Calling C from Rust     | ✅     | ✅  |
 
 ## Building
 
