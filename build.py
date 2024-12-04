@@ -78,13 +78,15 @@ try:
         edit_cargo_toml(wasm=True)
 
     if build_mode == "wasm":
-        run("wasm-pack build --target web -d ./consumers/web/pkg")
+        run(
+            "wasm-pack build --target web --out-dir ./consumers/web/pkg -- --color always"
+        )
     else:
-        run("cargo build")
+        run("cargo --color always build")
 
     if build_mode == "py":
         run(
-            "cargo run --bin uniffi-bindgen generate --library target/debug/libarithmetical.dylib --language python --out-dir consumers/python"
+            "cargo --color always run --bin uniffi-bindgen generate --library target/debug/libarithmetical.dylib --language python --out-dir consumers/python"
         )
 
         extension = None
