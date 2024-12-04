@@ -71,5 +71,5 @@ fn main() {
         out_path.join("bindings.rs").display()
     );
 
-    uniffi::generate_scaffolding("src/arithmetic.udl").unwrap();
+    uniffi::generate_scaffolding("src/playground.udl").unwrap();
 }

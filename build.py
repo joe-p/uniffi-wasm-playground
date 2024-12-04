@@ -86,7 +86,7 @@ try:
 
     if build_mode == "py":
         run(
-            "cargo --color always run --bin uniffi-bindgen generate --library target/debug/libarithmetical.dylib --language python --out-dir consumers/python"
+            "cargo --color always run --bin uniffi-bindgen generate --library target/debug/libplayground.dylib --language python --out-dir consumers/python"
         )
 
         extension = None
@@ -94,13 +94,13 @@ try:
         # Determine what the extension of the library is
         extensions = ("dylib", "so", "dll")
         for ext in extensions:
-            if os.path.exists(f"target/debug/libarithmetical.{ext}"):
+            if os.path.exists(f"target/debug/libplayground.{ext}"):
                 extension = ext
                 break
 
         copy_args = [
-            f"target/debug/libarithmetical.{extension}",
-            f"consumers/python/libarithmetical.{extension}",
+            f"target/debug/libplayground.{extension}",
+            f"consumers/python/libplayground.{extension}",
         ]
 
         # Copy the library file using Python's shutil

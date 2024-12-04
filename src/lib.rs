@@ -40,27 +40,27 @@ impl From<FalconError> for wasm_bindgen::JsValue {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum ArithmeticError {
+pub enum PlaygroundError {
     #[error("Integer overflow on an operation with {a} and {b}")]
     IntegerOverflow { a: u64, b: u64 },
 }
 
-impl From<ArithmeticError> for wasm_bindgen::JsValue {
-    fn from(error: ArithmeticError) -> Self {
+impl From<PlaygroundError> for wasm_bindgen::JsValue {
+    fn from(error: PlaygroundError) -> Self {
         wasm_bindgen::JsValue::from_str(&error.to_string())
     }
 }
 
 #[wasm_bindgen]
-pub fn add(a: u64, b: u64) -> Result<u64, ArithmeticError> {
+pub fn add(a: u64, b: u64) -> Result<u64, PlaygroundError> {
     a.checked_add(b)
-        .ok_or(ArithmeticError::IntegerOverflow { a, b })
+        .ok_or(PlaygroundError::IntegerOverflow { a, b })
 }
 
 #[wasm_bindgen]
-pub fn sub(a: u64, b: u64) -> Result<u64, ArithmeticError> {
+pub fn sub(a: u64, b: u64) -> Result<u64, PlaygroundError> {
     a.checked_sub(b)
-        .ok_or(ArithmeticError::IntegerOverflow { a, b })
+        .ok_or(PlaygroundError::IntegerOverflow { a, b })
 }
 
 #[wasm_bindgen]
@@ -144,4 +144,4 @@ pub fn falcon_genkey(seed: Vec<u8>) -> Result<FalconKeyPair, FalconError> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-uniffi::include_scaffolding!("arithmetic");
+uniffi::include_scaffolding!("playground");

@@ -1,5 +1,5 @@
 [package]
-name = "uniffi-example-arithmetic"
+name = "uniffi-example-playground"
 edition = "2021"
 version = "0.22.0"
 license = "MPL-2.0"
@@ -7,7 +7,7 @@ publish = false
 
 [lib]
 crate-type = ["lib", "cdylib"]
-name = "arithmetical"
+name = "playground"
 
 [dependencies]
 uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli"] }

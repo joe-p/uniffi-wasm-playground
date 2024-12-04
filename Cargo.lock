@@ -2353,7 +2353,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "uniffi-example-arithmetic"
+name = "uniffi-example-playground"
 version = "0.22.0"
 dependencies = [
  "async-std",

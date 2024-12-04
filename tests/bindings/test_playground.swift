@@ -1,9 +1,9 @@
-import arithmetic
+import playground
 
 do {
     let _ = try add(a: 18446744073709551615, b: 1)
     fatalError("Should have thrown a IntegerOverflow exception!")
-} catch ArithmeticError.IntegerOverflow {
+} catch PlaygroundError.IntegerOverflow {
     // It's okay!
 }
 
@@ -13,7 +13,7 @@ assert(try! add(a: 4, b: 8) == 12, "add work")
 do {
     let _ = try sub(a: 0, b: 1)
     fatalError("Should have thrown a IntegerOverflow exception!")
-} catch ArithmeticError.IntegerOverflow {
+} catch PlaygroundError.IntegerOverflow {
     // It's okay!
 }
 

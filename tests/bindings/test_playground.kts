@@ -1,4 +1,4 @@
-import org.mozilla.uniffi.example.arithmetic.*;
+import org.mozilla.uniffi.example.playground.*;
 
 assert(add(2u, 4u) == 6uL)
 assert(add(4u, 8u) == 12uL)
@@ -6,7 +6,7 @@ assert(add(4u, 8u) == 12uL)
 try {
     sub(0u, 2u)
     throw RuntimeException("Should have thrown a IntegerOverflow exception!")
-} catch (e: ArithmeticException) {
+} catch (e: PlaygroundException) {
     // It's okay!
 }
 

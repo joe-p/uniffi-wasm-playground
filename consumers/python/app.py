@@ -1,9 +1,9 @@
-from arithmetic import (
+from playground import (
     http_get,
     genkey,
     add,
     div,
-    ArithmeticError,
+    PlaygroundError,
     InternalError,
     falcon_genkey,
 )
@@ -28,7 +28,7 @@ async def main():
 
     try:
         add(MAX_U64, 1)
-    except ArithmeticError.IntegerOverflow as e:
+    except PlaygroundError.IntegerOverflow as e:
         print(f"We caught an error! {e.__class__.__name__}: {e}")
 
     try:

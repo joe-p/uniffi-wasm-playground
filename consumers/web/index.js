@@ -4,7 +4,7 @@ import init, {
   div,
   genkey,
   falcon_genkey,
-} from "./pkg/arithmetical.js";
+} from "./pkg/playground.js";
 
 const MAX_U64 = BigInt("18446744073709551615");
 

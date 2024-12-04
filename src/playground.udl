@@ -1,5 +1,5 @@
 [Error]
-enum ArithmeticError {
+enum PlaygroundError {
   "IntegerOverflow",
 };
 
@@ -14,11 +14,11 @@ dictionary FalconKeyPair {
 };
 
 
-namespace arithmetic {
-  [Throws=ArithmeticError]
+namespace playground {
+  [Throws=PlaygroundError]
   u64 add(u64 a, u64 b);
 
-  [Throws=ArithmeticError]
+  [Throws=PlaygroundError]
   u64 sub(u64 a, u64 b);
 
   u64 div(u64 dividend, u64 divisor);
