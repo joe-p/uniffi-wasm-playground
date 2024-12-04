@@ -13,32 +13,48 @@ fn main() {
     }
 
     build.include("falcon");
-    build.file("falcon/shake.c");
-    build.file("falcon/common.c");
-    build.file("falcon/codec.c");
-    build.file("falcon/keygen.c");
-    build.file("falcon/deterministic.c");
-    build.file("falcon/fpr.c");
-    build.file("falcon/sign.c");
-    build.file("falcon/fft.c");
-    build.file("falcon/falcon.c");
-    build.file("falcon/vrfy.c");
-    build.file("falcon/rng.c");
+
+    // Get all the C files in falcon
+    let falcon_files = std::fs::read_dir("falcon")
+        .unwrap()
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.extension()
+                .and_then(|ext| Some(ext == "c"))
+                .unwrap_or(false)
+        });
+    build.files(falcon_files);
     build.compile("c_falcon");
 
-    let bindings = bindgen::Builder::default()
-        // The headers we want to generate bindings for
-        .header("falcon/falcon.h")
-        .header("falcon/deterministic.h")
+    // We don't need to generate bindings for all the headers, so we specifify the desired headers here
+    let headers = vec!["falcon/falcon.h", "falcon/deterministic.h"];
+
+    // Additionally we don't need to use all the types and functions in these headers, so we specify the desired ones here
+    let allowed_types = vec!["shake256_context"];
+    let allowed_functions = vec!["falcon_det1024_keygen", "shake256_init_prng_from_seed"];
+
+    let mut bindings_builder = bindgen::Builder::default()
+        // This flag is needed when targeting wasm
         // See https://github.com/rust-lang/rust-bindgen/issues/2624#issuecomment-2518152955
         .clang_arg("-fvisibility=default")
-        // To avoid generating bindings for unused types/functions, we'll use allow lists
-        .allowlist_type("shake256_context")
-        .allowlist_function("falcon_det1024_keygen")
-        .allowlist_function("shake256_init_prng_from_seed")
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()));
+
+    for h in headers {
+        bindings_builder = bindings_builder.header(h);
+    }
+
+    for t in allowed_types {
+        bindings_builder = bindings_builder.allowlist_type(t);
+    }
+
+    for f in allowed_functions {
+        bindings_builder = bindings_builder.allowlist_function(f);
+    }
+
+    let bindings = bindings_builder
         // Finish the builder and generate the bindings.
         .generate()
         // Unwrap the Result and panic on failure.
