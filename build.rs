@@ -27,9 +27,9 @@ fn main() {
     build.compile("c_falcon");
 
     let bindings = bindgen::Builder::default()
-        // The input header we would like to generate
-        // bindings for.
-        .header("src/falcon.h")
+        // The headers we want to generate bindings for
+        .header("falcon/falcon.h")
+        .header("falcon/deterministic.h")
         // See https://github.com/rust-lang/rust-bindgen/issues/2624#issuecomment-2518152955
         .clang_arg("-fvisibility=default")
         // To avoid generating bindings for unused types/functions, we'll use allow lists
