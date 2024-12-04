@@ -13,29 +13,8 @@ use std::time::Duration;
 use tsify::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
-// We would ideally use rust-bindgen to generate this, but it doesn't work with wasm, so we have to handwrite the bindings for now
 mod falcon_ffi {
-    #[repr(C)]
-    #[derive(Debug, Copy, Clone)]
-    pub struct shake256_context {
-        pub opaque_contents: [u64; 26usize],
-    }
-
-    extern "C" {
-        pub fn falcon_det1024_keygen(
-            rng: *mut shake256_context,
-            privkey: *mut ::std::os::raw::c_void,
-            pubkey: *mut ::std::os::raw::c_void,
-        ) -> ::std::os::raw::c_int;
-    }
-
-    extern "C" {
-        pub fn shake256_init_prng_from_seed(
-            sc: *mut shake256_context,
-            seed: *const ::std::os::raw::c_void,
-            seed_len: usize,
-        );
-    }
+    include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
 
 // If we weren't using tsify here, we'd have to wasm_bindgen(getter_with_clone) for each field
