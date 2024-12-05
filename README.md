@@ -18,7 +18,7 @@ For more information about UniFFI, see the [official documentation](https://mozi
 
 \* = Third-party bindings
 
-[wasm-pack](https://github.com/rustwasm/wasm-pack) could also be used in conjunction with UniFFI to target JS (node and web) as well.
+[wasm-pack](https://github.com/rustwasm/wasm-pack) is also be used in conjunction with UniFFI to target JS (node and web) as well.
 
 ## Key Files
 
@@ -32,12 +32,12 @@ For more information about UniFFI, see the [official documentation](https://mozi
 
 ## What's been tested
 
-| Feature                 | Python | Web |
-| ----------------------- | ------ | --- |
-| Basic FFI bindings      | ✅     | ✅  |
-| Async HTTP FFI bindings | ✅     | ✅  |
-| Error handling          | ✅     | ✅  |
-| Calling C from Rust     | ✅     | ✅  |
+| Feature                                  | Python | Web |
+| ---------------------------------------- | ------ | --- |
+| Basic FFI bindings                       | ✅     | ✅  |
+| Async HTTP FFI bindings                  | ✅     | ✅  |
+| Error handling                           | ✅     | ✅  |
+| Calling C lib (c -> rust -> target lang) | ✅     | ✅  |
 
 ## Building
 
