@@ -4,7 +4,7 @@
 
 use std::{env, path::PathBuf};
 
-fn main() {
+fn link_c() {
     let mut build = cc::Build::new();
 
     if let Some(libc) = std::env::var_os("DEP_WASM32_UNKNOWN_UNKNOWN_OPENBSD_LIBC_INCLUDE") {
@@ -70,6 +70,9 @@ fn main() {
         "cargo:warning=Bindings generated in: {}",
         out_path.join("bindings.rs").display()
     );
+}
 
+fn main() {
+    link_c();
     uniffi::generate_scaffolding("src/playground.udl").unwrap();
 }
