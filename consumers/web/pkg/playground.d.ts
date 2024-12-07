@@ -8,8 +8,17 @@ export function say_after(ms: bigint, who: string): Promise<string>;
 export function http_get(url: string): Promise<string>;
 export function genkey(): Uint8Array;
 export function falcon_genkey(seed: Uint8Array): FalconKeyPair;
+/**
+ * A deterministic Falcon-1024 key pair
+ */
 export interface FalconKeyPair {
+    /**
+     * The public key
+     */
     public_key: number[];
+    /**
+     * The private key
+     */
     private_key: number[];
 }
 
@@ -26,17 +35,17 @@ export interface InitOutput {
   readonly http_get: (a: number, b: number) => any;
   readonly genkey: () => [number, number];
   readonly falcon_genkey: (a: number, b: number) => [number, number, number];
-  readonly __wbindgen_exn_store: (a: number) => void;
-  readonly __externref_table_alloc: () => number;
-  readonly __wbindgen_export_2: WebAssembly.Table;
-  readonly __wbindgen_export_3: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_exn_store: (a: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __wbindgen_export_4: WebAssembly.Table;
+  readonly __wbindgen_export_5: WebAssembly.Table;
   readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly closure261_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure264_externref_shim: (a: number, b: number, c: any) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h382eebc988c99998: (a: number, b: number) => void;
-  readonly closure290_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure293_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

@@ -74,5 +74,4 @@ fn link_c() {
 
 fn main() {
     link_c();
-    uniffi::generate_scaffolding("src/playground.udl").unwrap();
 }

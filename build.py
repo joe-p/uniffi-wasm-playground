@@ -81,6 +81,9 @@ try:
         run(
             "wasm-pack build --target web --out-dir ./consumers/web/pkg -- --color always"
         )
+
+        # Remove the generated .gitignore file from the pkg directory
+        os.remove("consumers/web/pkg/.gitignore")
     else:
         run("cargo --color always build")
 

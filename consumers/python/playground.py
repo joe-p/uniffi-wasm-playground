@@ -461,21 +461,21 @@ def _uniffi_check_contract_api_version(lib):
         raise InternalError("UniFFI contract version mismatch: try cleaning and rebuilding your project")
 
 def _uniffi_check_api_checksums(lib):
-    if lib.uniffi_playground_checksum_func_add() != 22134:
+    if lib.uniffi_playground_checksum_func_add() != 18524:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    if lib.uniffi_playground_checksum_func_div() != 34802:
+    if lib.uniffi_playground_checksum_func_div() != 64870:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    if lib.uniffi_playground_checksum_func_equal() != 13111:
+    if lib.uniffi_playground_checksum_func_equal() != 8990:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    if lib.uniffi_playground_checksum_func_falcon_genkey() != 1615:
+    if lib.uniffi_playground_checksum_func_falcon_genkey() != 34897:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    if lib.uniffi_playground_checksum_func_genkey() != 16992:
+    if lib.uniffi_playground_checksum_func_genkey() != 22160:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    if lib.uniffi_playground_checksum_func_http_get() != 33923:
+    if lib.uniffi_playground_checksum_func_http_get() != 48812:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    if lib.uniffi_playground_checksum_func_say_after() != 17834:
+    if lib.uniffi_playground_checksum_func_say_after() != 4073:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    if lib.uniffi_playground_checksum_func_sub() != 14803:
+    if lib.uniffi_playground_checksum_func_sub() != 57539:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
 
 # A ctypes library to expose the extern-C FFI definitions.
@@ -927,6 +927,19 @@ _uniffi_check_contract_api_version(_UniffiLib)
 # Public interface members begin here.
 
 
+class _UniffiConverterInt32(_UniffiConverterPrimitiveInt):
+    CLASS_NAME = "i32"
+    VALUE_MIN = -2**31
+    VALUE_MAX = 2**31
+
+    @staticmethod
+    def read(buf):
+        return buf.read_i32()
+
+    @staticmethod
+    def write(value, buf):
+        buf.write_i32(value)
+
 class _UniffiConverterUInt64(_UniffiConverterPrimitiveInt):
     CLASS_NAME = "u64"
     VALUE_MIN = 0
@@ -1015,8 +1028,20 @@ class _UniffiConverterBytes(_UniffiConverterRustBuffer):
 
 
 class FalconKeyPair:
+    """
+    A deterministic Falcon-1024 key pair
+    """
+
     public_key: "bytes"
+    """
+    The public key
+    """
+
     private_key: "bytes"
+    """
+    The private key
+    """
+
     def __init__(self, *, public_key: "bytes", private_key: "bytes"):
         self.public_key = public_key
         self.private_key = private_key
@@ -1063,9 +1088,19 @@ _UniffiTempFalconError = FalconError
 
 class FalconError:  # type: ignore
     class FalconKeygenFailed(_UniffiTempFalconError):
+        def __init__(self, *values):
+            if len(values) != 1:
+                raise TypeError(f"Expected 1 arguments, found {len(values)}")
+            if not isinstance(values[0], int):
+                raise TypeError(f"unexpected type for tuple element 0 - expected 'int', got '{type(values[0])}'")
+            super().__init__(", ".join(map(repr, values)))
+            self._values = values
+
+        def __getitem__(self, index):
+            return self._values[index]
 
         def __repr__(self):
-            return "FalconError.FalconKeygenFailed({})".format(repr(str(self)))
+            return "FalconError.FalconKeygenFailed({})".format(str(self))
     _UniffiTempFalconError.FalconKeygenFailed = FalconKeygenFailed # type: ignore
 
 FalconError = _UniffiTempFalconError # type: ignore
@@ -1078,19 +1113,21 @@ class _UniffiConverterTypeFalconError(_UniffiConverterRustBuffer):
         variant = buf.read_i32()
         if variant == 1:
             return FalconError.FalconKeygenFailed(
-                _UniffiConverterString.read(buf),
+                _UniffiConverterInt32.read(buf),
             )
         raise InternalError("Raw enum value doesn't match any cases")
 
     @staticmethod
     def check_lower(value):
         if isinstance(value, FalconError.FalconKeygenFailed):
+            _UniffiConverterInt32.check_lower(value._values[0])
             return
 
     @staticmethod
     def write(value, buf):
         if isinstance(value, FalconError.FalconKeygenFailed):
             buf.write_i32(1)
+            _UniffiConverterInt32.write(value._values[0], buf)
 
 
 # PlaygroundError
@@ -1106,9 +1143,16 @@ _UniffiTempPlaygroundError = PlaygroundError
 
 class PlaygroundError:  # type: ignore
     class IntegerOverflow(_UniffiTempPlaygroundError):
+        def __init__(self, a, b):
+            super().__init__(", ".join([
+                "a={!r}".format(a),
+                "b={!r}".format(b),
+            ]))
+            self.a = a
+            self.b = b
 
         def __repr__(self):
-            return "PlaygroundError.IntegerOverflow({})".format(repr(str(self)))
+            return "PlaygroundError.IntegerOverflow({})".format(str(self))
     _UniffiTempPlaygroundError.IntegerOverflow = IntegerOverflow # type: ignore
 
 PlaygroundError = _UniffiTempPlaygroundError # type: ignore
@@ -1121,19 +1165,24 @@ class _UniffiConverterTypePlaygroundError(_UniffiConverterRustBuffer):
         variant = buf.read_i32()
         if variant == 1:
             return PlaygroundError.IntegerOverflow(
-                _UniffiConverterString.read(buf),
+                _UniffiConverterUInt64.read(buf),
+                _UniffiConverterUInt64.read(buf),
             )
         raise InternalError("Raw enum value doesn't match any cases")
 
     @staticmethod
     def check_lower(value):
         if isinstance(value, PlaygroundError.IntegerOverflow):
+            _UniffiConverterUInt64.check_lower(value.a)
+            _UniffiConverterUInt64.check_lower(value.b)
             return
 
     @staticmethod
     def write(value, buf):
         if isinstance(value, PlaygroundError.IntegerOverflow):
             buf.write_i32(1)
+            _UniffiConverterUInt64.write(value.a, buf)
+            _UniffiConverterUInt64.write(value.b, buf)
 
 # Async support# RustFuturePoll values
 _UNIFFI_RUST_FUTURE_POLL_READY = 0
