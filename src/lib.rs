@@ -9,6 +9,7 @@ use ed25519_dalek::SigningKey;
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 use std::ffi::c_void;
+use std::sync::atomic::AtomicU64;
 use std::time::Duration;
 use tsify_next::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -158,4 +159,124 @@ pub fn falcon_genkey(seed: Vec<u8>) -> Result<FalconKeyPair, FalconError> {
         public_key,
         private_key,
     })
+}
+
+// Below are examples of passing objects across the FFI boundary
+// With objects, the implementation needs to be different for WASM and UniFFI
+// The main difference is that UniFFI objects must be thread safe (Send + Sync)
+// thus use atomic types or locks to enable safe access.
+// WASM, however, not only doesn't need thread safety but it SHOULD NOT have locks
+// because WASM is single threaded.
+
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Object))]
+pub struct FavoriteNumbers {
+    pub numbers: std::sync::Mutex<Vec<u64>>,
+    pub max_number: AtomicU64,
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
+impl FavoriteNumbers {
+    #[uniffi::constructor]
+    pub fn new() -> Self {
+        Self {
+            numbers: std::sync::Mutex::new(Vec::new()),
+            max_number: AtomicU64::new(0),
+        }
+    }
+
+    pub fn add_number(&self, number: u64) {
+        self.numbers.lock().unwrap().push(number);
+        self.max_number
+            .fetch_max(number, std::sync::atomic::Ordering::Relaxed);
+    }
+
+    pub fn find_min(&self) -> u64 {
+        self.numbers
+            .lock()
+            .unwrap()
+            .iter()
+            .copied()
+            .min()
+            .unwrap_or(0)
+    }
+
+    pub fn quick_sort(&self, numbers: Option<Vec<u64>>) -> Vec<u64> {
+        let numbers = numbers.unwrap_or_else(|| self.numbers.lock().unwrap().clone());
+        if numbers.len() <= 1 {
+            return numbers;
+        }
+
+        let pivot = numbers[numbers.len() - 1];
+        let less = numbers[..numbers.len() - 1]
+            .iter()
+            .filter(|&&x| x <= pivot)
+            .copied()
+            .collect();
+        let greater = numbers[..numbers.len() - 1]
+            .iter()
+            .filter(|&&x| x > pivot)
+            .copied()
+            .collect();
+
+        let mut result = self.quick_sort(Some(less));
+        result.push(pivot);
+        result.extend(self.quick_sort(Some(greater)));
+        result
+    }
+}
+
+#[wasm_bindgen]
+pub struct WasmFavoriteNumbers {
+    // getter_with_clone means the JS object will have a readonly getter that returns a clone of the vec
+    // rather than a reference.
+    #[wasm_bindgen(getter_with_clone)]
+    pub numbers: Vec<u64>,
+    pub max_number: u64,
+}
+
+#[wasm_bindgen]
+impl WasmFavoriteNumbers {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        Self {
+            numbers: Vec::new(),
+            max_number: 0,
+        }
+    }
+
+    #[wasm_bindgen]
+    pub fn add_number(&mut self, number: u64) {
+        self.numbers.push(number);
+        self.max_number = self.max_number.max(number);
+    }
+
+    #[wasm_bindgen]
+    pub fn find_min(&self) -> u64 {
+        self.numbers.iter().min().copied().unwrap_or(0)
+    }
+
+    #[wasm_bindgen]
+    pub fn quick_sort(&self, numbers: Option<Vec<u64>>) -> Vec<u64> {
+        let numbers = numbers.unwrap_or_else(|| self.numbers.clone());
+        if numbers.len() <= 1 {
+            return numbers;
+        }
+
+        let pivot = numbers[numbers.len() - 1];
+        let less = numbers[..numbers.len() - 1]
+            .iter()
+            .filter(|&&x| x <= pivot)
+            .copied()
+            .collect();
+        let greater = numbers[..numbers.len() - 1]
+            .iter()
+            .filter(|&&x| x > pivot)
+            .copied()
+            .collect();
+
+        let mut result = self.quick_sort(Some(less));
+        result.push(pivot);
+        result.extend(self.quick_sort(Some(greater)));
+        result
+    }
 }

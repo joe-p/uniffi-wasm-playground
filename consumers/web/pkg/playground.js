@@ -306,6 +306,26 @@ export function falcon_genkey(seed) {
     return takeFromExternrefTable0(ret[0]);
 }
 
+let cachedBigUint64ArrayMemory0 = null;
+
+function getBigUint64ArrayMemory0() {
+    if (cachedBigUint64ArrayMemory0 === null || cachedBigUint64ArrayMemory0.byteLength === 0) {
+        cachedBigUint64ArrayMemory0 = new BigUint64Array(wasm.memory.buffer);
+    }
+    return cachedBigUint64ArrayMemory0;
+}
+
+function getArrayU64FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getBigUint64ArrayMemory0().subarray(ptr / 8, ptr / 8 + len);
+}
+
+function passArray64ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 8, 8) >>> 0;
+    getBigUint64ArrayMemory0().set(arg, ptr / 8);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
 function __wbg_adapter_30(arg0, arg1, arg2) {
     wasm.closure264_externref_shim(arg0, arg1, arg2);
 }
@@ -314,8 +334,88 @@ function __wbg_adapter_33(arg0, arg1) {
     wasm._dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h382eebc988c99998(arg0, arg1);
 }
 
-function __wbg_adapter_122(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_130(arg0, arg1, arg2, arg3) {
     wasm.closure293_externref_shim(arg0, arg1, arg2, arg3);
+}
+
+const WasmFavoriteNumbersFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_wasmfavoritenumbers_free(ptr >>> 0, 1));
+
+export class WasmFavoriteNumbers {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        WasmFavoriteNumbersFinalization.unregister(this);
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_wasmfavoritenumbers_free(ptr, 0);
+    }
+    /**
+     * @returns {BigUint64Array}
+     */
+    get numbers() {
+        const ret = wasm.__wbg_get_wasmfavoritenumbers_numbers(this.__wbg_ptr);
+        var v1 = getArrayU64FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+        return v1;
+    }
+    /**
+     * @param {BigUint64Array} arg0
+     */
+    set numbers(arg0) {
+        const ptr0 = passArray64ToWasm0(arg0, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.__wbg_set_wasmfavoritenumbers_numbers(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @returns {bigint}
+     */
+    get max_number() {
+        const ret = wasm.__wbg_get_wasmfavoritenumbers_max_number(this.__wbg_ptr);
+        return BigInt.asUintN(64, ret);
+    }
+    /**
+     * @param {bigint} arg0
+     */
+    set max_number(arg0) {
+        wasm.__wbg_set_wasmfavoritenumbers_max_number(this.__wbg_ptr, arg0);
+    }
+    constructor() {
+        const ret = wasm.wasmfavoritenumbers_new();
+        this.__wbg_ptr = ret >>> 0;
+        WasmFavoriteNumbersFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * @param {bigint} number
+     */
+    add_number(number) {
+        wasm.wasmfavoritenumbers_add_number(this.__wbg_ptr, number);
+    }
+    /**
+     * @returns {bigint}
+     */
+    find_min() {
+        const ret = wasm.wasmfavoritenumbers_find_min(this.__wbg_ptr);
+        return BigInt.asUintN(64, ret);
+    }
+    /**
+     * @param {BigUint64Array | undefined} [numbers]
+     * @returns {BigUint64Array}
+     */
+    quick_sort(numbers) {
+        var ptr0 = isLikeNone(numbers) ? 0 : passArray64ToWasm0(numbers, wasm.__wbindgen_malloc);
+        var len0 = WASM_VECTOR_LEN;
+        const ret = wasm.wasmfavoritenumbers_quick_sort(this.__wbg_ptr, ptr0, len0);
+        var v2 = getArrayU64FromWasm0(ret[0], ret[1]).slice();
+        wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+        return v2;
+    }
 }
 
 async function __wbg_load(module, imports) {
@@ -473,7 +573,7 @@ function __wbg_get_imports() {
                 const a = state0.a;
                 state0.a = 0;
                 try {
-                    return __wbg_adapter_122(a, state0.b, arg0, arg1);
+                    return __wbg_adapter_130(a, state0.b, arg0, arg1);
                 } finally {
                     state0.a = a;
                 }
@@ -605,11 +705,11 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper922 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper940 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 265, __wbg_adapter_30);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper959 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper977 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 282, __wbg_adapter_33);
         return ret;
     };
@@ -681,6 +781,7 @@ function __wbg_init_memory(imports, memory) {
 function __wbg_finalize_init(instance, module) {
     wasm = instance.exports;
     __wbg_init.__wbindgen_wasm_module = module;
+    cachedBigUint64ArrayMemory0 = null;
     cachedDataViewMemory0 = null;
     cachedUint8ArrayMemory0 = null;
 

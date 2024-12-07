@@ -22,6 +22,15 @@ export interface FalconKeyPair {
     private_key: number[];
 }
 
+export class WasmFavoriteNumbers {
+  free(): void;
+  constructor();
+  add_number(number: bigint): void;
+  find_min(): bigint;
+  quick_sort(numbers?: BigUint64Array): BigUint64Array;
+  numbers: BigUint64Array;
+  max_number: bigint;
+}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -35,6 +44,15 @@ export interface InitOutput {
   readonly http_get: (a: number, b: number) => any;
   readonly genkey: () => [number, number];
   readonly falcon_genkey: (a: number, b: number) => [number, number, number];
+  readonly __wbg_wasmfavoritenumbers_free: (a: number, b: number) => void;
+  readonly __wbg_get_wasmfavoritenumbers_numbers: (a: number) => [number, number];
+  readonly __wbg_set_wasmfavoritenumbers_numbers: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_wasmfavoritenumbers_max_number: (a: number) => bigint;
+  readonly __wbg_set_wasmfavoritenumbers_max_number: (a: number, b: bigint) => void;
+  readonly wasmfavoritenumbers_new: () => number;
+  readonly wasmfavoritenumbers_add_number: (a: number, b: bigint) => void;
+  readonly wasmfavoritenumbers_find_min: (a: number) => bigint;
+  readonly wasmfavoritenumbers_quick_sort: (a: number, b: number, c: number) => [number, number];
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;

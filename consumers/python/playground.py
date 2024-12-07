@@ -477,6 +477,14 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_sub() != 57539:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_favoritenumbers_add_number() != 30592:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_favoritenumbers_find_min() != 30626:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_favoritenumbers_quick_sort() != 8953:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_constructor_favoritenumbers_new() != 62699:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
 
 # A ctypes library to expose the extern-C FFI definitions.
 # This is an implementation detail which will be called internally by the public API.
@@ -583,6 +591,37 @@ class _UniffiForeignFutureStructVoid(ctypes.Structure):
     ]
 _UNIFFI_FOREIGN_FUTURE_COMPLETE_VOID = ctypes.CFUNCTYPE(None,ctypes.c_uint64,_UniffiForeignFutureStructVoid,
 )
+_UniffiLib.uniffi_playground_fn_clone_favoritenumbers.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_favoritenumbers.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_favoritenumbers.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_favoritenumbers.restype = None
+_UniffiLib.uniffi_playground_fn_constructor_favoritenumbers_new.argtypes = (
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_constructor_favoritenumbers_new.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_method_favoritenumbers_add_number.argtypes = (
+    ctypes.c_void_p,
+    ctypes.c_uint64,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_favoritenumbers_add_number.restype = None
+_UniffiLib.uniffi_playground_fn_method_favoritenumbers_find_min.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_favoritenumbers_find_min.restype = ctypes.c_uint64
+_UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort.argtypes = (
+    ctypes.c_void_p,
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_playground_fn_func_add.argtypes = (
     ctypes.c_uint64,
     ctypes.c_uint64,
@@ -917,6 +956,18 @@ _UniffiLib.uniffi_playground_checksum_func_say_after.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_sub.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_sub.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_favoritenumbers_add_number.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_favoritenumbers_add_number.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_favoritenumbers_find_min.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_favoritenumbers_find_min.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_favoritenumbers_quick_sort.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_favoritenumbers_quick_sort.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_constructor_favoritenumbers_new.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_constructor_favoritenumbers_new.restype = ctypes.c_uint16
 _UniffiLib.ffi_playground_uniffi_contract_version.argtypes = (
 )
 _UniffiLib.ffi_playground_uniffi_contract_version.restype = ctypes.c_uint32
@@ -1025,6 +1076,102 @@ class _UniffiConverterBytes(_UniffiConverterRustBuffer):
     def write(value, buf):
         buf.write_i32(len(value))
         buf.write(value)
+
+
+
+class FavoriteNumbersProtocol(typing.Protocol):
+    def add_number(self, number: "int"):
+        raise NotImplementedError
+    def find_min(self, ):
+        raise NotImplementedError
+    def quick_sort(self, numbers: "typing.Optional[typing.List[int]]"):
+        raise NotImplementedError
+
+
+class FavoriteNumbers:
+    _pointer: ctypes.c_void_p
+    def __init__(self, ):
+        self._pointer = _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_constructor_favoritenumbers_new,)
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_favoritenumbers, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_favoritenumbers, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def add_number(self, number: "int") -> None:
+        _UniffiConverterUInt64.check_lower(number)
+        
+        _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_add_number,self._uniffi_clone_pointer(),
+        _UniffiConverterUInt64.lower(number))
+
+
+
+
+
+
+    def find_min(self, ) -> "int":
+        return _UniffiConverterUInt64.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_find_min,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+    def quick_sort(self, numbers: "typing.Optional[typing.List[int]]") -> "typing.List[int]":
+        _UniffiConverterOptionalSequenceUInt64.check_lower(numbers)
+        
+        return _UniffiConverterSequenceUInt64.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort,self._uniffi_clone_pointer(),
+        _UniffiConverterOptionalSequenceUInt64.lower(numbers))
+        )
+
+
+
+
+
+
+class _UniffiConverterTypeFavoriteNumbers:
+
+    @staticmethod
+    def lift(value: int):
+        return FavoriteNumbers._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: FavoriteNumbers):
+        if not isinstance(value, FavoriteNumbers):
+            raise TypeError("Expected FavoriteNumbers instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: FavoriteNumbersProtocol):
+        if not isinstance(value, FavoriteNumbers):
+            raise TypeError("Expected FavoriteNumbers instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: FavoriteNumbersProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
 
 
 class FalconKeyPair:
@@ -1183,6 +1330,58 @@ class _UniffiConverterTypePlaygroundError(_UniffiConverterRustBuffer):
             buf.write_i32(1)
             _UniffiConverterUInt64.write(value.a, buf)
             _UniffiConverterUInt64.write(value.b, buf)
+
+
+
+class _UniffiConverterOptionalSequenceUInt64(_UniffiConverterRustBuffer):
+    @classmethod
+    def check_lower(cls, value):
+        if value is not None:
+            _UniffiConverterSequenceUInt64.check_lower(value)
+
+    @classmethod
+    def write(cls, value, buf):
+        if value is None:
+            buf.write_u8(0)
+            return
+
+        buf.write_u8(1)
+        _UniffiConverterSequenceUInt64.write(value, buf)
+
+    @classmethod
+    def read(cls, buf):
+        flag = buf.read_u8()
+        if flag == 0:
+            return None
+        elif flag == 1:
+            return _UniffiConverterSequenceUInt64.read(buf)
+        else:
+            raise InternalError("Unexpected flag byte for optional type")
+
+
+
+class _UniffiConverterSequenceUInt64(_UniffiConverterRustBuffer):
+    @classmethod
+    def check_lower(cls, value):
+        for item in value:
+            _UniffiConverterUInt64.check_lower(item)
+
+    @classmethod
+    def write(cls, value, buf):
+        items = len(value)
+        buf.write_i32(items)
+        for item in value:
+            _UniffiConverterUInt64.write(item, buf)
+
+    @classmethod
+    def read(cls, buf):
+        count = buf.read_i32()
+        if count < 0:
+            raise InternalError("Unexpected negative sequence length")
+
+        return [
+            _UniffiConverterUInt64.read(buf) for i in range(count)
+        ]
 
 # Async support# RustFuturePoll values
 _UNIFFI_RUST_FUTURE_POLL_READY = 0
@@ -1351,5 +1550,6 @@ __all__ = [
     "http_get",
     "say_after",
     "sub",
+    "FavoriteNumbers",
 ]
 
