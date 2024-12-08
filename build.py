@@ -85,11 +85,11 @@ try:
         # Remove the generated .gitignore file from the pkg directory
         os.remove("consumers/web/pkg/.gitignore")
     else:
-        run("cargo --color always build")
+        run("cargo --color always build --release")
 
     if build_mode == "py":
         run(
-            "cargo --color always run --bin uniffi-bindgen generate --library target/debug/libplayground.dylib --language python --out-dir consumers/python"
+            "cargo --color always run --bin uniffi-bindgen generate --library target/release/libplayground.dylib --language python --out-dir consumers/python"
         )
 
         extension = None
@@ -97,12 +97,12 @@ try:
         # Determine what the extension of the library is
         extensions = ("dylib", "so", "dll")
         for ext in extensions:
-            if os.path.exists(f"target/debug/libplayground.{ext}"):
+            if os.path.exists(f"target/release/libplayground.{ext}"):
                 extension = ext
                 break
 
         copy_args = [
-            f"target/debug/libplayground.{extension}",
+            f"target/release/libplayground.{extension}",
             f"consumers/python/libplayground.{extension}",
         ]
 

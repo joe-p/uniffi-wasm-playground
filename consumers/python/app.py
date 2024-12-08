@@ -7,11 +7,15 @@ from playground import (
     InternalError,
     falcon_genkey,
     FavoriteNumbers,
+    UserRecord,
+    user_object_from_record,
+    no_op,
 )
 import asyncio
 import json
 import time
 import random
+import msgpack
 
 MAX_U64 = 18446744073709551615
 
@@ -47,50 +51,141 @@ class NativeFavoriteNumbers:
         return self.quick_sort(less) + [pivot] + self.quick_sort(greater)
 
 
+def native_no_op():
+    pass
+
+
+def time_it(func, iterations):
+    start = time.time()
+    ret_val = func()
+    end = time.time()
+
+    seconds = end - start
+    ms_per_iter = 1000 * (seconds) / iterations
+
+    print(
+        f"{func.__name__:<35} {ms_per_iter:.6f} ms/iter ({seconds:.6f} sec/{iterations})"
+    )
+    return ret_val
+
+
 def bench():
     favorite_numbers = FavoriteNumbers()
     native_favorite_numbers = NativeFavoriteNumbers()
     iterations = 10_000
 
-    # numbers is a list of random numbers
+    colors = [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "purple",
+        "orange",
+        "pink",
+        "brown",
+        "gray",
+        "black",
+        "white",
+        "teal",
+        "navy",
+        "maroon",
+        "violet",
+    ]
+    # Generate fake users with random favorite numbers and colors
+    user_records = [
+        UserRecord(
+            id=i,
+            favorite_numbers=[random.randint(0, iterations) for _ in range(100)],
+            favorite_colors=[random.choice(colors) for _ in range(5)],
+        )
+        for i in range(iterations)
+    ]
+
+    print("Converting between Python class and Rust struct:")
+
+    def py_class_to_rust_struct():
+        return [user_object_from_record(user_record) for user_record in user_records]
+
+    user_objects = time_it(py_class_to_rust_struct, iterations)
+
+    def rust_struct_to_py_class():
+        return [user_object.to_record() for user_object in user_objects]
+
+    user_records_from_objects = time_it(rust_struct_to_py_class, iterations)
+
+    print("\nSerializing a class/struct to msgpack:")
+
+    def serialize_rust_struct():
+        return [user_object.serialize() for user_object in user_objects]
+
+    time_it(serialize_rust_struct, iterations)
+
+    def serialize_python_class():
+        return [
+            msgpack.packb(user_record.__dict__)
+            for user_record in user_records_from_objects
+        ]
+
+    time_it(serialize_python_class, iterations)
+
     numbers = [random.randint(0, iterations) for _ in range(iterations)]
 
-    start = time.time()
-    for n in numbers:
-        native_favorite_numbers.add_number(n)
-    end = time.time()
-    print(f"Python push time taken: {end - start} seconds")
+    print("\nPushing to an array of numbers in a class/struct:")
 
-    start = time.time()
-    for n in numbers:
-        favorite_numbers.add_number(n)
-    end = time.time()
-    print(f"FFI push time taken: {end - start} seconds")
+    def native_push():
+        for n in numbers:
+            native_favorite_numbers.add_number(n)
 
-    start = time.time()
-    for _ in range(iterations):
-        native_favorite_numbers.find_min()
-    end = time.time()
-    print(f"Python find min time taken: {end - start} seconds")
+    time_it(native_push, iterations)
 
-    start = time.time()
-    for _ in range(iterations):
-        favorite_numbers.find_min()
-    end = time.time()
-    print(f"FFI find min time taken: {end - start} seconds")
+    def push_ffi():
+        for n in numbers:
+            favorite_numbers.add_number(n)
 
-    start = time.time()
-    native_favorite_numbers.quick_sort()
-    end = time.time()
-    print(f"Python quicksort time taken: {end - start} seconds")
+    time_it(push_ffi, iterations)
 
-    start = time.time()
-    favorite_numbers.quick_sort(None)
-    end = time.time()
-    print(f"FFI quicksort time taken: {end - start} seconds")
+    print("\nFinding the min value in an array of numbers in a class/struct:")
+
+    def find_min_native():
+        for _ in range(iterations):
+            native_favorite_numbers.find_min()
+
+    time_it(find_min_native, iterations)
+
+    def find_min_ffi():
+        for _ in range(iterations):
+            favorite_numbers.find_min()
+
+    time_it(find_min_ffi, iterations)
+
+    print("\nQuick sort algo on an array of numbers in a class/struct:")
+
+    def quick_sort_native():
+        return native_favorite_numbers.quick_sort()
+
+    time_it(quick_sort_native, iterations)
+
+    def quick_sort_ffi():
+        return favorite_numbers.quick_sort(None)
+
+    time_it(quick_sort_ffi, iterations)
+
+    print("\nCalling a no-op function:")
+
+    def no_op_ffi():
+        for _ in range(iterations):
+            no_op()
+
+    time_it(no_op_ffi, iterations)
+
+    def no_op_native():
+        for _ in range(iterations):
+            native_no_op()
+
+    time_it(no_op_native, iterations)
 
 
-async def main():
+async def demo():
     # "Heavy" computation like key generation
     print("ed25519 key:", genkey())
 
@@ -113,8 +208,6 @@ async def main():
     except ValueError as e:
         print(f"We caught an error thrown by the binding! {e.__class__.__name__}: {e}")
 
-    bench()
-
     # Async HTTP requests
     status = http_get("https://testnet-api.4160.nodely.dev/v2/status")
     last_round = json.loads(await status)["last-round"]
@@ -130,6 +223,11 @@ async def main():
     round_1 = wait_for_round(last_round + 1)
 
     await asyncio.gather(round_2, round_1)
+
+
+async def main():
+    await demo()
+    bench()
 
 
 if __name__ == "__main__":

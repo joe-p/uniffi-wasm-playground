@@ -473,15 +473,23 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_http_get() != 48812:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_no_op() != 57756:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_say_after() != 4073:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_sub() != 57539:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_user_object_from_record() != 40020:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_favoritenumbers_add_number() != 30592:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_favoritenumbers_find_min() != 30626:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_favoritenumbers_quick_sort() != 8953:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_userobject_serialize() != 17774:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_userobject_to_record() != 62864:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_constructor_favoritenumbers_new() != 62699:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
@@ -622,6 +630,26 @@ _UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_playground_fn_clone_userobject.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_userobject.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_userobject.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_userobject.restype = None
+_UniffiLib.uniffi_playground_fn_method_userobject_serialize.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_userobject_serialize.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_playground_fn_method_userobject_to_record.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_userobject_to_record.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_playground_fn_func_add.argtypes = (
     ctypes.c_uint64,
     ctypes.c_uint64,
@@ -653,6 +681,10 @@ _UniffiLib.uniffi_playground_fn_func_http_get.argtypes = (
     _UniffiRustBuffer,
 )
 _UniffiLib.uniffi_playground_fn_func_http_get.restype = ctypes.c_uint64
+_UniffiLib.uniffi_playground_fn_func_no_op.argtypes = (
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_func_no_op.restype = None
 _UniffiLib.uniffi_playground_fn_func_say_after.argtypes = (
     ctypes.c_uint64,
     _UniffiRustBuffer,
@@ -664,6 +696,11 @@ _UniffiLib.uniffi_playground_fn_func_sub.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_playground_fn_func_sub.restype = ctypes.c_uint64
+_UniffiLib.uniffi_playground_fn_func_user_object_from_record.argtypes = (
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_func_user_object_from_record.restype = ctypes.c_void_p
 _UniffiLib.ffi_playground_rustbuffer_alloc.argtypes = (
     ctypes.c_uint64,
     ctypes.POINTER(_UniffiRustCallStatus),
@@ -950,12 +987,18 @@ _UniffiLib.uniffi_playground_checksum_func_genkey.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_http_get.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_http_get.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_no_op.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_no_op.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_say_after.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_say_after.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_sub.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_sub.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_user_object_from_record.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_user_object_from_record.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_add_number.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_add_number.restype = ctypes.c_uint16
@@ -965,6 +1008,12 @@ _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_find_min.restype = 
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_quick_sort.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_quick_sort.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_userobject_serialize.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_userobject_serialize.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_userobject_to_record.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_userobject_to_record.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_constructor_favoritenumbers_new.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_constructor_favoritenumbers_new.restype = ctypes.c_uint16
@@ -1174,6 +1223,87 @@ class _UniffiConverterTypeFavoriteNumbers:
         buf.write_u64(cls.lower(value))
 
 
+
+class UserObjectProtocol(typing.Protocol):
+    def serialize(self, ):
+        raise NotImplementedError
+    def to_record(self, ):
+        raise NotImplementedError
+
+
+class UserObject:
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_userobject, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_userobject, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def serialize(self, ) -> "bytes":
+        return _UniffiConverterBytes.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_userobject_serialize,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+    def to_record(self, ) -> "UserRecord":
+        return _UniffiConverterTypeUserRecord.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_userobject_to_record,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+
+class _UniffiConverterTypeUserObject:
+
+    @staticmethod
+    def lift(value: int):
+        return UserObject._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: UserObject):
+        if not isinstance(value, UserObject):
+            raise TypeError("Expected UserObject instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: UserObjectProtocol):
+        if not isinstance(value, UserObject):
+            raise TypeError("Expected UserObject instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: UserObjectProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+
+
 class FalconKeyPair:
     """
     A deterministic Falcon-1024 key pair
@@ -1220,6 +1350,49 @@ class _UniffiConverterTypeFalconKeyPair(_UniffiConverterRustBuffer):
     def write(value, buf):
         _UniffiConverterBytes.write(value.public_key, buf)
         _UniffiConverterBytes.write(value.private_key, buf)
+
+
+class UserRecord:
+    id: "int"
+    favorite_numbers: "typing.List[int]"
+    favorite_colors: "typing.List[str]"
+    def __init__(self, *, id: "int", favorite_numbers: "typing.List[int]", favorite_colors: "typing.List[str]"):
+        self.id = id
+        self.favorite_numbers = favorite_numbers
+        self.favorite_colors = favorite_colors
+
+    def __str__(self):
+        return "UserRecord(id={}, favorite_numbers={}, favorite_colors={})".format(self.id, self.favorite_numbers, self.favorite_colors)
+
+    def __eq__(self, other):
+        if self.id != other.id:
+            return False
+        if self.favorite_numbers != other.favorite_numbers:
+            return False
+        if self.favorite_colors != other.favorite_colors:
+            return False
+        return True
+
+class _UniffiConverterTypeUserRecord(_UniffiConverterRustBuffer):
+    @staticmethod
+    def read(buf):
+        return UserRecord(
+            id=_UniffiConverterUInt64.read(buf),
+            favorite_numbers=_UniffiConverterSequenceUInt64.read(buf),
+            favorite_colors=_UniffiConverterSequenceString.read(buf),
+        )
+
+    @staticmethod
+    def check_lower(value):
+        _UniffiConverterUInt64.check_lower(value.id)
+        _UniffiConverterSequenceUInt64.check_lower(value.favorite_numbers)
+        _UniffiConverterSequenceString.check_lower(value.favorite_colors)
+
+    @staticmethod
+    def write(value, buf):
+        _UniffiConverterUInt64.write(value.id, buf)
+        _UniffiConverterSequenceUInt64.write(value.favorite_numbers, buf)
+        _UniffiConverterSequenceString.write(value.favorite_colors, buf)
 
 
 # FalconError
@@ -1383,6 +1556,31 @@ class _UniffiConverterSequenceUInt64(_UniffiConverterRustBuffer):
             _UniffiConverterUInt64.read(buf) for i in range(count)
         ]
 
+
+
+class _UniffiConverterSequenceString(_UniffiConverterRustBuffer):
+    @classmethod
+    def check_lower(cls, value):
+        for item in value:
+            _UniffiConverterString.check_lower(item)
+
+    @classmethod
+    def write(cls, value, buf):
+        items = len(value)
+        buf.write_i32(items)
+        for item in value:
+            _UniffiConverterString.write(item, buf)
+
+    @classmethod
+    def read(cls, buf):
+        count = buf.read_i32()
+        if count < 0:
+            raise InternalError("Unexpected negative sequence length")
+
+        return [
+            _UniffiConverterString.read(buf) for i in range(count)
+        ]
+
 # Async support# RustFuturePoll values
 _UNIFFI_RUST_FUTURE_POLL_READY = 0
 _UNIFFI_RUST_FUTURE_POLL_MAYBE_READY = 1
@@ -1505,6 +1703,10 @@ async def http_get(url: "str") -> "str":
     None,
 
     )
+
+def no_op() -> None:
+    _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_no_op,)
+
 async def say_after(ms: "int",who: "str") -> "str":
 
     _UniffiConverterUInt64.check_lower(ms)
@@ -1537,19 +1739,30 @@ def sub(a: "int",b: "int") -> "int":
         _UniffiConverterUInt64.lower(b)))
 
 
+def user_object_from_record(record: "UserRecord") -> "UserObject":
+    _UniffiConverterTypeUserRecord.check_lower(record)
+    
+    return _UniffiConverterTypeUserObject.lift(_uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_user_object_from_record,
+        _UniffiConverterTypeUserRecord.lower(record)))
+
+
 __all__ = [
     "InternalError",
     "FalconError",
     "PlaygroundError",
     "FalconKeyPair",
+    "UserRecord",
     "add",
     "div",
     "equal",
     "falcon_genkey",
     "genkey",
     "http_get",
+    "no_op",
     "say_after",
     "sub",
+    "user_object_from_record",
     "FavoriteNumbers",
+    "UserObject",
 ]
 

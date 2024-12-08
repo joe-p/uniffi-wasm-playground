@@ -30,6 +30,7 @@ serde = "1.0.215"
 # tsify with serde uses serde-wasm-bindgen under the hood to convert structs to TS types
 # This makes life easier when writing rust and makes the dev experience better for JS consumers
 tsify-next = { version = "0.5.4", features = ["js"] }
+rmp-serde = "1.3.0"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm32-unknown-unknown-openbsd-libc = "0.2"

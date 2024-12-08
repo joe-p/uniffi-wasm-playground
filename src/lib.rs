@@ -7,6 +7,7 @@ extern crate async_std;
 use async_std::future::{pending, timeout};
 use ed25519_dalek::SigningKey;
 use rand::rngs::OsRng;
+use rmp_serde;
 use serde::{Deserialize, Serialize};
 use std::ffi::c_void;
 use std::sync::atomic::AtomicU64;
@@ -279,4 +280,41 @@ impl WasmFavoriteNumbers {
         result.extend(self.quick_sort(Some(greater)));
         result
     }
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Record))]
+#[derive(Deserialize, Serialize, Clone)]
+pub struct UserRecord {
+    pub id: u64,
+    pub favorite_numbers: Vec<u64>,
+    pub favorite_colors: Vec<String>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Object))]
+pub struct UserObject {
+    pub user_record: UserRecord,
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
+impl UserObject {
+    pub fn serialize(&self) -> Vec<u8> {
+        rmp_serde::to_vec_named(&self.user_record).unwrap()
+    }
+
+    pub fn to_record(&self) -> UserRecord {
+        self.user_record.clone()
+    }
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
+pub fn user_object_from_record(record: UserRecord) -> UserObject {
+    UserObject {
+        user_record: record,
+    }
+}
+
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
+pub fn no_op() {
+    // no-op
 }
