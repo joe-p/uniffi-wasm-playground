@@ -283,7 +283,8 @@ impl WasmFavoriteNumbers {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Record))]
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Tsify, Deserialize, Serialize, Clone)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct UserRecord {
     pub id: u64,
     pub favorite_numbers: Vec<u64>,
@@ -315,6 +316,45 @@ pub fn user_object_from_record(record: UserRecord) -> UserObject {
 }
 
 #[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 pub fn no_op() {
     // no-op
+}
+
+#[wasm_bindgen]
+pub struct WasmUserObject {
+    pub id: u64,
+    #[wasm_bindgen(getter_with_clone)]
+    pub favorite_numbers: Vec<u64>,
+    #[wasm_bindgen(getter_with_clone)]
+    pub favorite_colors: Vec<String>,
+}
+
+#[wasm_bindgen]
+impl WasmUserObject {
+    #[wasm_bindgen(constructor)]
+    pub fn new(id: u64, favorite_numbers: Vec<u64>, favorite_colors: Vec<String>) -> Self {
+        Self {
+            id,
+            favorite_numbers,
+            favorite_colors,
+        }
+    }
+
+    pub fn to_record(&self) -> UserRecord {
+        UserRecord {
+            id: self.id,
+            favorite_numbers: self.favorite_numbers.clone(),
+            favorite_colors: self.favorite_colors.clone(),
+        }
+    }
+}
+
+#[wasm_bindgen]
+pub fn wasm_user_object_from_record(record: UserRecord) -> WasmUserObject {
+    WasmUserObject {
+        id: record.id,
+        favorite_numbers: record.favorite_numbers,
+        favorite_colors: record.favorite_colors,
+    }
 }

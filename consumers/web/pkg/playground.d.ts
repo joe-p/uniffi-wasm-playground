@@ -8,6 +8,8 @@ export function say_after(ms: bigint, who: string): Promise<string>;
 export function http_get(url: string): Promise<string>;
 export function genkey(): Uint8Array;
 export function falcon_genkey(seed: Uint8Array): FalconKeyPair;
+export function no_op(): void;
+export function wasm_user_object_from_record(record: UserRecord): WasmUserObject;
 /**
  * A deterministic Falcon-1024 key pair
  */
@@ -22,6 +24,12 @@ export interface FalconKeyPair {
     private_key: number[];
 }
 
+export interface UserRecord {
+    id: number;
+    favorite_numbers: number[];
+    favorite_colors: string[];
+}
+
 export class WasmFavoriteNumbers {
   free(): void;
   constructor();
@@ -30,6 +38,14 @@ export class WasmFavoriteNumbers {
   quick_sort(numbers?: BigUint64Array): BigUint64Array;
   numbers: BigUint64Array;
   max_number: bigint;
+}
+export class WasmUserObject {
+  free(): void;
+  constructor(id: bigint, favorite_numbers: BigUint64Array, favorite_colors: (string)[]);
+  to_record(): UserRecord;
+  id: bigint;
+  favorite_numbers: BigUint64Array;
+  favorite_colors: (string)[];
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -53,6 +69,17 @@ export interface InitOutput {
   readonly wasmfavoritenumbers_add_number: (a: number, b: bigint) => void;
   readonly wasmfavoritenumbers_find_min: (a: number) => bigint;
   readonly wasmfavoritenumbers_quick_sort: (a: number, b: number, c: number) => [number, number];
+  readonly no_op: () => void;
+  readonly __wbg_wasmuserobject_free: (a: number, b: number) => void;
+  readonly __wbg_get_wasmuserobject_favorite_colors: (a: number) => [number, number];
+  readonly __wbg_set_wasmuserobject_favorite_colors: (a: number, b: number, c: number) => void;
+  readonly wasmuserobject_new: (a: bigint, b: number, c: number, d: number, e: number) => number;
+  readonly wasmuserobject_to_record: (a: number) => any;
+  readonly wasm_user_object_from_record: (a: any) => number;
+  readonly __wbg_set_wasmuserobject_favorite_numbers: (a: number, b: number, c: number) => void;
+  readonly __wbg_get_wasmuserobject_id: (a: number) => bigint;
+  readonly __wbg_get_wasmuserobject_favorite_numbers: (a: number) => [number, number];
+  readonly __wbg_set_wasmuserobject_id: (a: number, b: bigint) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;
@@ -61,9 +88,10 @@ export interface InitOutput {
   readonly __wbindgen_export_5: WebAssembly.Table;
   readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly closure264_externref_shim: (a: number, b: number, c: any) => void;
-  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h382eebc988c99998: (a: number, b: number) => void;
-  readonly closure293_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly __externref_drop_slice: (a: number, b: number) => void;
+  readonly closure286_externref_shim: (a: number, b: number, c: any) => void;
+  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h47237acf41b3a1e3: (a: number, b: number) => void;
+  readonly closure315_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 
