@@ -19,16 +19,12 @@ from __future__ import annotations
 import os
 import sys
 import ctypes
-import enum
 import struct
 import contextlib
-import datetime
 import threading
 import itertools
-import traceback
 import typing
 import asyncio
-import platform
 
 # Used for default argument values
 _DEFAULT = object() # type: typing.Any

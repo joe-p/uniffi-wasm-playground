@@ -101,32 +101,19 @@ def bench():
         for i in range(iterations)
     ]
 
-    print("Converting between Python class and Rust struct:")
+    print("\nCalling a no-op function:")
 
-    def py_class_to_rust_struct():
-        return [user_object_from_record(user_record) for user_record in user_records]
+    def no_op_ffi():
+        for _ in range(iterations):
+            no_op()
 
-    user_objects = time_it(py_class_to_rust_struct, iterations)
+    time_it(no_op_ffi, iterations)
 
-    def rust_struct_to_py_class():
-        return [user_object.to_record() for user_object in user_objects]
+    def no_op_native():
+        for _ in range(iterations):
+            native_no_op()
 
-    user_records_from_objects = time_it(rust_struct_to_py_class, iterations)
-
-    print("\nSerializing a class/struct to msgpack:")
-
-    def serialize_rust_struct():
-        return [user_object.serialize() for user_object in user_objects]
-
-    time_it(serialize_rust_struct, iterations)
-
-    def serialize_python_class():
-        return [
-            msgpack.packb(user_record.__dict__)
-            for user_record in user_records_from_objects
-        ]
-
-    time_it(serialize_python_class, iterations)
+    time_it(no_op_native, iterations)
 
     numbers = [random.randint(0, iterations) for _ in range(iterations)]
 
@@ -170,19 +157,32 @@ def bench():
 
     time_it(quick_sort_ffi, iterations)
 
-    print("\nCalling a no-op function:")
+    print("\nConverting between Python class and Rust struct:")
 
-    def no_op_ffi():
-        for _ in range(iterations):
-            no_op()
+    def py_class_to_rust_struct():
+        return [user_object_from_record(user_record) for user_record in user_records]
 
-    time_it(no_op_ffi, iterations)
+    user_objects = time_it(py_class_to_rust_struct, iterations)
 
-    def no_op_native():
-        for _ in range(iterations):
-            native_no_op()
+    def rust_struct_to_py_class():
+        return [user_object.to_record() for user_object in user_objects]
 
-    time_it(no_op_native, iterations)
+    user_records_from_objects = time_it(rust_struct_to_py_class, iterations)
+
+    print("\nSerializing a class/struct to msgpack:")
+
+    def serialize_rust_struct():
+        return [user_object.serialize() for user_object in user_objects]
+
+    time_it(serialize_rust_struct, iterations)
+
+    def serialize_python_class():
+        return [
+            msgpack.packb(user_record.__dict__)
+            for user_record in user_records_from_objects
+        ]
+
+    time_it(serialize_python_class, iterations)
 
 
 async def demo():
