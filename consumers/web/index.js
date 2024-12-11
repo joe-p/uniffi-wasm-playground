@@ -181,7 +181,7 @@ function bench() {
     1
   );
 
-  const noOpIterations = 1_000_000;
+  const noOpIterations = 1_000_000_000;
 
   timeIt(
     "no_op",
