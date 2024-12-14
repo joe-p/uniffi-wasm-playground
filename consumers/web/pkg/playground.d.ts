@@ -89,9 +89,8 @@ export interface InitOutput {
   readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __externref_drop_slice: (a: number, b: number) => void;
-  readonly closure286_externref_shim: (a: number, b: number, c: any) => void;
-  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h47237acf41b3a1e3: (a: number, b: number) => void;
-  readonly closure315_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure144_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure222_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

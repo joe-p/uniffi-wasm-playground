@@ -169,6 +169,9 @@ def bench():
 
     user_records_from_objects = time_it(rust_struct_to_py_class, iterations)
 
+    print(user_records[0].__dict__)
+    print(user_objects[0])
+
     print("\nSerializing a class/struct to msgpack:")
 
     def serialize_rust_struct():

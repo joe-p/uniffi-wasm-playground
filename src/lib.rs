@@ -2,16 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-extern crate async_std;
-
-use async_std::future::{pending, timeout};
 use ed25519_dalek::SigningKey;
 use rand::rngs::OsRng;
 use rmp_serde;
 use serde::{Deserialize, Serialize};
 use std::ffi::c_void;
+use std::future::pending;
 use std::sync::atomic::AtomicU64;
 use std::time::Duration;
+use tokio::time::timeout;
 use tsify_next::Tsify;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -92,7 +91,7 @@ pub fn equal(a: u64, b: u64) -> bool {
 }
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export(async_runtime = "tokio"))]
 pub async fn say_after(ms: u64, who: String) -> String {
     println!("called say_after({ms}, {who})");
     let never = pending::<()>();
@@ -102,10 +101,10 @@ pub async fn say_after(ms: u64, who: String) -> String {
 }
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
-#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export(async_runtime = "tokio"))]
 pub async fn http_get(url: String) -> String {
     println!("called http_get({})", &url);
-    let body = surf::get(&url).recv_string().await.unwrap();
+    let body = reqwest::get(&url).await.unwrap().text().await.unwrap();
 
     println!("done http_get({url})");
     body

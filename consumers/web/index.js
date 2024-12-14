@@ -238,8 +238,6 @@ async function demo() {
     console.log(`The error is just a string: ${e}`);
   }
 
-  bench();
-
   const status = http_get("https://testnet-api.4160.nodely.dev/v2/status");
   const lastRound = JSON.parse(await status)["last-round"];
   console.log(`Last round: ${lastRound}`);

@@ -48,70 +48,39 @@ def run(command):
         print(f"Error running subprocess: {e}")
 
 
-def edit_cargo_toml(*, wasm: bool):
-    # read Cargo.toml
-    with open("Cargo.toml", "r") as file:
-        cargo_toml = file.read()
+build_mode = "rust"
 
-    replace_strs = [
-        'surf = { version = "2.3.2" }',
-        'surf = { version = "2.3.2", default-features = false, features = ["wasm-client"] }',
+if len(sys.argv) > 1:
+    build_mode = sys.argv[1]
+
+if build_mode == "wasm":
+    run("wasm-pack build --target web --out-dir ./consumers/web/pkg -- --color always")
+
+    # Remove the generated .gitignore file from the pkg directory
+    os.remove("consumers/web/pkg/.gitignore")
+else:
+    run("cargo --color always build --release")
+
+if build_mode == "py":
+    run(
+        "cargo --color always run --bin uniffi-bindgen generate --library target/release/libplayground.dylib --language python --out-dir consumers/python"
+    )
+
+    extension = None
+
+    # Determine what the extension of the library is
+    extensions = ("dylib", "so", "dll")
+    for ext in extensions:
+        if os.path.exists(f"target/release/libplayground.{ext}"):
+            extension = ext
+            break
+
+    copy_args = [
+        f"target/release/libplayground.{extension}",
+        f"consumers/python/libplayground.{extension}",
     ]
 
-    if not wasm:
-        replace_strs.reverse()
+    # Copy the library file using Python's shutil
+    shutil.copy2(*copy_args)
 
-    cargo_toml = cargo_toml.replace(replace_strs[0], replace_strs[1])
-
-    # write back to Cargo.toml
-    with open("Cargo.toml", "w") as file:
-        file.write(cargo_toml)
-
-
-try:
-    build_mode = "rust"
-
-    if len(sys.argv) > 1:
-        build_mode = sys.argv[1]
-
-    if build_mode == "wasm":
-        edit_cargo_toml(wasm=True)
-
-    if build_mode == "wasm":
-        run(
-            "wasm-pack build --target web --out-dir ./consumers/web/pkg -- --color always"
-        )
-
-        # Remove the generated .gitignore file from the pkg directory
-        os.remove("consumers/web/pkg/.gitignore")
-    else:
-        run("cargo --color always build --release")
-
-    if build_mode == "py":
-        run(
-            "cargo --color always run --bin uniffi-bindgen generate --library target/release/libplayground.dylib --language python --out-dir consumers/python"
-        )
-
-        extension = None
-
-        # Determine what the extension of the library is
-        extensions = ("dylib", "so", "dll")
-        for ext in extensions:
-            if os.path.exists(f"target/release/libplayground.{ext}"):
-                extension = ext
-                break
-
-        copy_args = [
-            f"target/release/libplayground.{extension}",
-            f"consumers/python/libplayground.{extension}",
-        ]
-
-        # Copy the library file using Python's shutil
-        shutil.copy2(*copy_args)
-
-        print(f"Copied {copy_args[0]} to {copy_args[1]}")
-
-
-finally:
-    # Ensure we always reset the Cargo.toml to the original state
-    edit_cargo_toml(wasm=False)
+    print(f"Copied {copy_args[0]} to {copy_args[1]}")

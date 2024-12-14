@@ -10,28 +10,28 @@ crate-type = ["lib", "cdylib"]
 name = "playground"
 
 [dependencies]
-uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli"] }
-thiserror = "1.0"
-async-std = "1.13.0"
-
-# The features of surf will get changed by build.py depending on if we're building for wasm or not
-# See https://github.com/rust-lang/cargo/issues/1197
-# If this is the only change in a commit, assume it's a mistake because build.py should always reset it
-surf = { version = "2.3.2" }
-
+uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli", "tokio"] }
 wasm-bindgen = "0.2.97"
-getrandom = { version = "0.2.15", features = ["js"] }
 wasm-bindgen-futures = "0.4.47"
-ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
-rand = "0.8.5"
-console_error_panic_hook = "0.1.7"
+thiserror = "1.0"
 serde = "1.0.215"
 
 # tsify with serde uses serde-wasm-bindgen under the hood to convert structs to TS types
 # This makes life easier when writing rust and makes the dev experience better for JS consumers
 tsify-next = { version = "0.5.4", features = ["js"] }
-rmp-serde = "1.3.0"
 
+# reqwest is used for the HTTP client
+reqwest = "0.12.9"
+# tokio is used for the async runtime (specifically for reqwest)
+tokio = { version= "1.42.0", features = ["time"] }
+
+# Various packages just used for testing
+ed25519-dalek = { version = "2.1.1", features = ["rand_core"] }
+rand = "0.8.5"
+rmp-serde = "1.3.0"
+getrandom = { version = "0.2.15", features = ["js"] }
+
+# Needed for linking C code in wasm
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm32-unknown-unknown-openbsd-libc = "0.2"
 
@@ -43,10 +43,6 @@ uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"
 
 [dev-dependencies]
 uniffi = { version = "0.28.3", features = ["bindgen-tests"] }
-
-[patch.crates-io]
-# see https://github.com/koute/stdweb/issues/427#issuecomment-2510242651
-stdweb = { git = "https://github.com/Dampfwalze/stdweb/", rev = "a0086b4bd9b3116edeb679fe0ca477d48e06bb32" }
 
 [[bin]]
 # This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
