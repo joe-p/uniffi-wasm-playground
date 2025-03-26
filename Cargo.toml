@@ -42,7 +42,7 @@ cc = "1.2.2"
 uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"] }
 
 [dev-dependencies]
-uniffi = { version = "0.28.3", features = ["bindgen-tests"] }
+uniffi = { version = "0.28.3" }
 
 [[bin]]
 # This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
