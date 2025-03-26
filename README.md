@@ -1,5 +1,7 @@
 # UniFFI WASM Playground
 
+**NOTE:** Further work is not happening in this repo. For more production-ready examples and build steps, see https://github.com/algorandfoundation/Algorand-Rust-FFIs
+
 This is a repo that is being used to play around with UniFFI and WASM. It is based on the [UniFFI Arithmetic Example](https://github.com/mozilla/uniffi-rs/tree/main/examples/arithmetic). So far everything has been tested on MacOS.
 
 For more information about UniFFI, see the [official documentation](https://mozilla.github.io/uniffi-rs/) and the [README](https://github.com/mozilla/uniffi-rs/blob/main/README.md).
