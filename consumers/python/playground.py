@@ -481,6 +481,8 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_user_object_from_record() != 40020:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_asyncadder_add_async() != 38814:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_favoritenumbers_add_number() != 30592:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_favoritenumbers_find_min() != 30626:
@@ -599,6 +601,33 @@ class _UniffiForeignFutureStructVoid(ctypes.Structure):
     ]
 _UNIFFI_FOREIGN_FUTURE_COMPLETE_VOID = ctypes.CFUNCTYPE(None,ctypes.c_uint64,_UniffiForeignFutureStructVoid,
 )
+_UNIFFI_CALLBACK_INTERFACE_ASYNC_ADDER_METHOD0 = ctypes.CFUNCTYPE(None,ctypes.c_uint64,ctypes.c_uint64,ctypes.c_uint64,_UNIFFI_FOREIGN_FUTURE_COMPLETE_U64,ctypes.c_uint64,ctypes.POINTER(_UniffiForeignFuture),
+)
+class _UniffiVTableCallbackInterfaceAsyncAdder(ctypes.Structure):
+    _fields_ = [
+        ("add_async", _UNIFFI_CALLBACK_INTERFACE_ASYNC_ADDER_METHOD0),
+        ("uniffi_free", _UNIFFI_CALLBACK_INTERFACE_FREE),
+    ]
+_UniffiLib.uniffi_playground_fn_clone_asyncadder.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_asyncadder.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_asyncadder.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_asyncadder.restype = None
+_UniffiLib.uniffi_playground_fn_init_callback_vtable_asyncadder.argtypes = (
+    ctypes.POINTER(_UniffiVTableCallbackInterfaceAsyncAdder),
+)
+_UniffiLib.uniffi_playground_fn_init_callback_vtable_asyncadder.restype = None
+_UniffiLib.uniffi_playground_fn_method_asyncadder_add_async.argtypes = (
+    ctypes.c_void_p,
+    ctypes.c_uint64,
+    ctypes.c_uint64,
+)
+_UniffiLib.uniffi_playground_fn_method_asyncadder_add_async.restype = ctypes.c_uint64
 _UniffiLib.uniffi_playground_fn_clone_favoritenumbers.argtypes = (
     ctypes.c_void_p,
     ctypes.POINTER(_UniffiRustCallStatus),
@@ -999,6 +1028,9 @@ _UniffiLib.uniffi_playground_checksum_func_sub.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_user_object_from_record.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_user_object_from_record.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_asyncadder_add_async.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_asyncadder_add_async.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_add_number.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_add_number.restype = ctypes.c_uint16
@@ -1125,6 +1157,174 @@ class _UniffiConverterBytes(_UniffiConverterRustBuffer):
     def write(value, buf):
         buf.write_i32(len(value))
         buf.write(value)
+
+
+
+class AsyncAdder(typing.Protocol):
+    def add_async(self, a: "int",b: "int"):
+        raise NotImplementedError
+
+
+class AsyncAdderImpl:
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_asyncadder, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_asyncadder, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+    async def add_async(self, a: "int",b: "int") -> "int":
+        _UniffiConverterUInt64.check_lower(a)
+        
+        _UniffiConverterUInt64.check_lower(b)
+        
+        return await _uniffi_rust_call_async(
+            _UniffiLib.uniffi_playground_fn_method_asyncadder_add_async(
+                self._uniffi_clone_pointer(), 
+        _UniffiConverterUInt64.lower(a),
+        _UniffiConverterUInt64.lower(b)
+            ),
+            _UniffiLib.ffi_playground_rust_future_poll_u64,
+            _UniffiLib.ffi_playground_rust_future_complete_u64,
+            _UniffiLib.ffi_playground_rust_future_free_u64,
+            # lift function
+            _UniffiConverterUInt64.lift,
+            
+    # Error FFI converter
+
+    None,
+
+        )
+
+
+# Magic number for the Rust proxy to call using the same mechanism as every other method,
+# to free the callback once it's dropped by Rust.
+_UNIFFI_IDX_CALLBACK_FREE = 0
+# Return codes for callback calls
+_UNIFFI_CALLBACK_SUCCESS = 0
+_UNIFFI_CALLBACK_ERROR = 1
+_UNIFFI_CALLBACK_UNEXPECTED_ERROR = 2
+
+class _UniffiCallbackInterfaceFfiConverter:
+    _handle_map = _UniffiHandleMap()
+
+    @classmethod
+    def lift(cls, handle):
+        return cls._handle_map.get(handle)
+
+    @classmethod
+    def read(cls, buf):
+        handle = buf.read_u64()
+        cls.lift(handle)
+
+    @classmethod
+    def check_lower(cls, cb):
+        pass
+
+    @classmethod
+    def lower(cls, cb):
+        handle = cls._handle_map.insert(cb)
+        return handle
+
+    @classmethod
+    def write(cls, cb, buf):
+        buf.write_u64(cls.lower(cb))
+
+# Put all the bits inside a class to keep the top-level namespace clean
+class _UniffiTraitImplAsyncAdder:
+    # For each method, generate a callback function to pass to Rust
+
+    @_UNIFFI_CALLBACK_INTERFACE_ASYNC_ADDER_METHOD0
+    def add_async(
+            uniffi_handle,
+            a,
+            b,
+            uniffi_future_callback,
+            uniffi_callback_data,
+            uniffi_out_return,
+        ):
+        uniffi_obj = _UniffiConverterTypeAsyncAdder._handle_map.get(uniffi_handle)
+        def make_call():
+            args = (_UniffiConverterUInt64.lift(a), _UniffiConverterUInt64.lift(b), )
+            method = uniffi_obj.add_async
+            return method(*args)
+
+        
+        def handle_success(return_value):
+            uniffi_future_callback(
+                uniffi_callback_data,
+                _UniffiForeignFutureStructU64(
+                    _UniffiConverterUInt64.lower(return_value),
+                    _UniffiRustCallStatus.default()
+                )
+            )
+
+        def handle_error(status_code, rust_buffer):
+            uniffi_future_callback(
+                uniffi_callback_data,
+                _UniffiForeignFutureStructU64(
+                    0,
+                    _UniffiRustCallStatus(status_code, rust_buffer),
+                )
+            )
+        uniffi_out_return[0] = _uniffi_trait_interface_call_async(make_call, handle_success, handle_error)
+
+    @_UNIFFI_CALLBACK_INTERFACE_FREE
+    def _uniffi_free(uniffi_handle):
+        _UniffiConverterTypeAsyncAdder._handle_map.remove(uniffi_handle)
+
+    # Generate the FFI VTable.  This has a field for each callback interface method.
+    _uniffi_vtable = _UniffiVTableCallbackInterfaceAsyncAdder(
+        add_async,
+        _uniffi_free
+    )
+    # Send Rust a pointer to the VTable.  Note: this means we need to keep the struct alive forever,
+    # or else bad things will happen when Rust tries to access it.
+    _UniffiLib.uniffi_playground_fn_init_callback_vtable_asyncadder(ctypes.byref(_uniffi_vtable))
+
+
+
+class _UniffiConverterTypeAsyncAdder:
+    _handle_map = _UniffiHandleMap()
+
+    @staticmethod
+    def lift(value: int):
+        return AsyncAdderImpl._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: AsyncAdder):
+        pass
+
+    @staticmethod
+    def lower(value: AsyncAdder):
+        return _UniffiConverterTypeAsyncAdder._handle_map.insert(value)
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: AsyncAdder, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
 
 
 
@@ -1644,6 +1844,54 @@ async def _uniffi_rust_call_async(rust_future, ffi_poll, ffi_complete, ffi_free,
         )
     finally:
         ffi_free(rust_future)
+def _uniffi_trait_interface_call_async(make_call, handle_success, handle_error):
+    async def make_call_and_call_callback():
+        try:
+            handle_success(await make_call())
+        except Exception as e:
+            print("UniFFI: Unhandled exception in trait interface call", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            handle_error(
+                _UniffiRustCallStatus.CALL_UNEXPECTED_ERROR,
+                _UniffiConverterString.lower(repr(e)),
+            )
+    eventloop = _uniffi_get_event_loop()
+    task = asyncio.run_coroutine_threadsafe(make_call_and_call_callback(), eventloop)
+    handle = _UNIFFI_FOREIGN_FUTURE_HANDLE_MAP.insert((eventloop, task))
+    return _UniffiForeignFuture(handle, _uniffi_foreign_future_free)
+
+def _uniffi_trait_interface_call_async_with_error(make_call, handle_success, handle_error, error_type, lower_error):
+    async def make_call_and_call_callback():
+        try:
+            try:
+                handle_success(await make_call())
+            except error_type as e:
+                handle_error(
+                    _UniffiRustCallStatus.CALL_ERROR,
+                    lower_error(e),
+                )
+        except Exception as e:
+            print("UniFFI: Unhandled exception in trait interface call", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            handle_error(
+                _UniffiRustCallStatus.CALL_UNEXPECTED_ERROR,
+                _UniffiConverterString.lower(repr(e)),
+            )
+    eventloop = _uniffi_get_event_loop()
+    task = asyncio.run_coroutine_threadsafe(make_call_and_call_callback(), eventloop)
+    handle = _UNIFFI_FOREIGN_FUTURE_HANDLE_MAP.insert((eventloop, task))
+    return _UniffiForeignFuture(handle, _uniffi_foreign_future_free)
+
+_UNIFFI_FOREIGN_FUTURE_HANDLE_MAP = _UniffiHandleMap()
+
+@_UNIFFI_FOREIGN_FUTURE_FREE
+def _uniffi_foreign_future_free(handle):
+    (eventloop, task) = _UNIFFI_FOREIGN_FUTURE_HANDLE_MAP.remove(handle)
+    eventloop.call_soon(_uniffi_foreign_future_do_free, task)
+
+def _uniffi_foreign_future_do_free(task):
+    if not task.done():
+        task.cancel()
 
 def add(a: "int",b: "int") -> "int":
     _UniffiConverterUInt64.check_lower(a)
@@ -1762,6 +2010,7 @@ __all__ = [
     "say_after",
     "sub",
     "user_object_from_record",
+    "AsyncAdder",
     "FavoriteNumbers",
     "UserObject",
 ]

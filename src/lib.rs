@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+use async_trait::async_trait;
 use ed25519_dalek::SigningKey;
 use rand::rngs::OsRng;
 use rmp_serde;
@@ -356,4 +357,10 @@ pub fn wasm_user_object_from_record(record: UserRecord) -> WasmUserObject {
         favorite_numbers: record.favorite_numbers,
         favorite_colors: record.favorite_colors,
     }
+}
+
+#[uniffi::export(with_foreign)]
+#[async_trait]
+trait AsyncAdder: Send + Sync {
+    async fn add_async(&self, a: u64, b: u64) -> u64;
 }
