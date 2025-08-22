@@ -454,7 +454,7 @@ def _uniffi_load_indirect():
 
 def _uniffi_check_contract_api_version(lib):
     # Get the bindings contract version from our ComponentInterface
-    bindings_contract_version = 26
+    bindings_contract_version = 29
     # Get the scaffolding contract version by calling the into the dylib
     scaffolding_contract_version = lib.ffi_playground_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version:
@@ -1068,7 +1068,38 @@ _uniffi_check_contract_api_version(_UniffiLib)
 # _uniffi_check_api_checksums(_UniffiLib)
 
 # Public interface members begin here.
+# Magic number for the Rust proxy to call using the same mechanism as every other method,
+# to free the callback once it's dropped by Rust.
+_UNIFFI_IDX_CALLBACK_FREE = 0
+# Return codes for callback calls
+_UNIFFI_CALLBACK_SUCCESS = 0
+_UNIFFI_CALLBACK_ERROR = 1
+_UNIFFI_CALLBACK_UNEXPECTED_ERROR = 2
 
+class _UniffiCallbackInterfaceFfiConverter:
+    _handle_map = _UniffiHandleMap()
+
+    @classmethod
+    def lift(cls, handle):
+        return cls._handle_map.get(handle)
+
+    @classmethod
+    def read(cls, buf):
+        handle = buf.read_u64()
+        cls.lift(handle)
+
+    @classmethod
+    def check_lower(cls, cb):
+        pass
+
+    @classmethod
+    def lower(cls, cb):
+        handle = cls._handle_map.insert(cb)
+        return handle
+
+    @classmethod
+    def write(cls, cb, buf):
+        buf.write_u64(cls.lower(cb))
 
 class _UniffiConverterInt32(_UniffiConverterPrimitiveInt):
     CLASS_NAME = "i32"
@@ -1171,348 +1202,9 @@ class _UniffiConverterBytes(_UniffiConverterRustBuffer):
 
 
 
-class AsyncAdder(typing.Protocol):
-    def add_async(self, a: "int",b: "int"):
-        raise NotImplementedError
 
 
-class AsyncAdderImpl:
-    _pointer: ctypes.c_void_p
-    
-    def __init__(self, *args, **kwargs):
-        raise ValueError("This class has no default constructor")
 
-    def __del__(self):
-        # In case of partial initialization of instances.
-        pointer = getattr(self, "_pointer", None)
-        if pointer is not None:
-            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_asyncadder, pointer)
-
-    def _uniffi_clone_pointer(self):
-        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_asyncadder, self._pointer)
-
-    # Used by alternative constructors or any methods which return this type.
-    @classmethod
-    def _make_instance_(cls, pointer):
-        # Lightly yucky way to bypass the usual __init__ logic
-        # and just create a new instance with the required pointer.
-        inst = cls.__new__(cls)
-        inst._pointer = pointer
-        return inst
-
-    async def add_async(self, a: "int",b: "int") -> "int":
-        _UniffiConverterUInt64.check_lower(a)
-        
-        _UniffiConverterUInt64.check_lower(b)
-        
-        return await _uniffi_rust_call_async(
-            _UniffiLib.uniffi_playground_fn_method_asyncadder_add_async(
-                self._uniffi_clone_pointer(), 
-        _UniffiConverterUInt64.lower(a),
-        _UniffiConverterUInt64.lower(b)
-            ),
-            _UniffiLib.ffi_playground_rust_future_poll_u64,
-            _UniffiLib.ffi_playground_rust_future_complete_u64,
-            _UniffiLib.ffi_playground_rust_future_free_u64,
-            # lift function
-            _UniffiConverterUInt64.lift,
-            
-    # Error FFI converter
-
-    None,
-
-        )
-
-
-# Magic number for the Rust proxy to call using the same mechanism as every other method,
-# to free the callback once it's dropped by Rust.
-_UNIFFI_IDX_CALLBACK_FREE = 0
-# Return codes for callback calls
-_UNIFFI_CALLBACK_SUCCESS = 0
-_UNIFFI_CALLBACK_ERROR = 1
-_UNIFFI_CALLBACK_UNEXPECTED_ERROR = 2
-
-class _UniffiCallbackInterfaceFfiConverter:
-    _handle_map = _UniffiHandleMap()
-
-    @classmethod
-    def lift(cls, handle):
-        return cls._handle_map.get(handle)
-
-    @classmethod
-    def read(cls, buf):
-        handle = buf.read_u64()
-        cls.lift(handle)
-
-    @classmethod
-    def check_lower(cls, cb):
-        pass
-
-    @classmethod
-    def lower(cls, cb):
-        handle = cls._handle_map.insert(cb)
-        return handle
-
-    @classmethod
-    def write(cls, cb, buf):
-        buf.write_u64(cls.lower(cb))
-
-# Put all the bits inside a class to keep the top-level namespace clean
-class _UniffiTraitImplAsyncAdder:
-    # For each method, generate a callback function to pass to Rust
-
-    @_UNIFFI_CALLBACK_INTERFACE_ASYNC_ADDER_METHOD0
-    def add_async(
-            uniffi_handle,
-            a,
-            b,
-            uniffi_future_callback,
-            uniffi_callback_data,
-            uniffi_out_return,
-        ):
-        uniffi_obj = _UniffiConverterTypeAsyncAdder._handle_map.get(uniffi_handle)
-        def make_call():
-            args = (_UniffiConverterUInt64.lift(a), _UniffiConverterUInt64.lift(b), )
-            method = uniffi_obj.add_async
-            return method(*args)
-
-        
-        def handle_success(return_value):
-            uniffi_future_callback(
-                uniffi_callback_data,
-                _UniffiForeignFutureStructU64(
-                    _UniffiConverterUInt64.lower(return_value),
-                    _UniffiRustCallStatus.default()
-                )
-            )
-
-        def handle_error(status_code, rust_buffer):
-            uniffi_future_callback(
-                uniffi_callback_data,
-                _UniffiForeignFutureStructU64(
-                    0,
-                    _UniffiRustCallStatus(status_code, rust_buffer),
-                )
-            )
-        uniffi_out_return[0] = _uniffi_trait_interface_call_async(make_call, handle_success, handle_error)
-
-    @_UNIFFI_CALLBACK_INTERFACE_FREE
-    def _uniffi_free(uniffi_handle):
-        _UniffiConverterTypeAsyncAdder._handle_map.remove(uniffi_handle)
-
-    # Generate the FFI VTable.  This has a field for each callback interface method.
-    _uniffi_vtable = _UniffiVTableCallbackInterfaceAsyncAdder(
-        add_async,
-        _uniffi_free
-    )
-    # Send Rust a pointer to the VTable.  Note: this means we need to keep the struct alive forever,
-    # or else bad things will happen when Rust tries to access it.
-    _UniffiLib.uniffi_playground_fn_init_callback_vtable_asyncadder(ctypes.byref(_uniffi_vtable))
-
-
-
-class _UniffiConverterTypeAsyncAdder:
-    _handle_map = _UniffiHandleMap()
-
-    @staticmethod
-    def lift(value: int):
-        return AsyncAdderImpl._make_instance_(value)
-
-    @staticmethod
-    def check_lower(value: AsyncAdder):
-        pass
-
-    @staticmethod
-    def lower(value: AsyncAdder):
-        return _UniffiConverterTypeAsyncAdder._handle_map.insert(value)
-
-    @classmethod
-    def read(cls, buf: _UniffiRustBuffer):
-        ptr = buf.read_u64()
-        if ptr == 0:
-            raise InternalError("Raw pointer value was null")
-        return cls.lift(ptr)
-
-    @classmethod
-    def write(cls, value: AsyncAdder, buf: _UniffiRustBuffer):
-        buf.write_u64(cls.lower(value))
-
-
-
-class FavoriteNumbersProtocol(typing.Protocol):
-    def add_number(self, number: "int"):
-        raise NotImplementedError
-    def find_min(self, ):
-        raise NotImplementedError
-    def quick_sort(self, numbers: "typing.Optional[typing.List[int]]"):
-        raise NotImplementedError
-
-
-class FavoriteNumbers:
-    _pointer: ctypes.c_void_p
-    def __init__(self, ):
-        self._pointer = _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_constructor_favoritenumbers_new,)
-
-    def __del__(self):
-        # In case of partial initialization of instances.
-        pointer = getattr(self, "_pointer", None)
-        if pointer is not None:
-            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_favoritenumbers, pointer)
-
-    def _uniffi_clone_pointer(self):
-        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_favoritenumbers, self._pointer)
-
-    # Used by alternative constructors or any methods which return this type.
-    @classmethod
-    def _make_instance_(cls, pointer):
-        # Lightly yucky way to bypass the usual __init__ logic
-        # and just create a new instance with the required pointer.
-        inst = cls.__new__(cls)
-        inst._pointer = pointer
-        return inst
-
-
-    def add_number(self, number: "int") -> None:
-        _UniffiConverterUInt64.check_lower(number)
-        
-        _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_add_number,self._uniffi_clone_pointer(),
-        _UniffiConverterUInt64.lower(number))
-
-
-
-
-
-
-    def find_min(self, ) -> "int":
-        return _UniffiConverterUInt64.lift(
-            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_find_min,self._uniffi_clone_pointer(),)
-        )
-
-
-
-
-
-    def quick_sort(self, numbers: "typing.Optional[typing.List[int]]") -> "typing.List[int]":
-        _UniffiConverterOptionalSequenceUInt64.check_lower(numbers)
-        
-        return _UniffiConverterSequenceUInt64.lift(
-            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort,self._uniffi_clone_pointer(),
-        _UniffiConverterOptionalSequenceUInt64.lower(numbers))
-        )
-
-
-
-
-
-
-class _UniffiConverterTypeFavoriteNumbers:
-
-    @staticmethod
-    def lift(value: int):
-        return FavoriteNumbers._make_instance_(value)
-
-    @staticmethod
-    def check_lower(value: FavoriteNumbers):
-        if not isinstance(value, FavoriteNumbers):
-            raise TypeError("Expected FavoriteNumbers instance, {} found".format(type(value).__name__))
-
-    @staticmethod
-    def lower(value: FavoriteNumbersProtocol):
-        if not isinstance(value, FavoriteNumbers):
-            raise TypeError("Expected FavoriteNumbers instance, {} found".format(type(value).__name__))
-        return value._uniffi_clone_pointer()
-
-    @classmethod
-    def read(cls, buf: _UniffiRustBuffer):
-        ptr = buf.read_u64()
-        if ptr == 0:
-            raise InternalError("Raw pointer value was null")
-        return cls.lift(ptr)
-
-    @classmethod
-    def write(cls, value: FavoriteNumbersProtocol, buf: _UniffiRustBuffer):
-        buf.write_u64(cls.lower(value))
-
-
-
-class UserObjectProtocol(typing.Protocol):
-    def serialize(self, ):
-        raise NotImplementedError
-    def to_record(self, ):
-        raise NotImplementedError
-
-
-class UserObject:
-    _pointer: ctypes.c_void_p
-    
-    def __init__(self, *args, **kwargs):
-        raise ValueError("This class has no default constructor")
-
-    def __del__(self):
-        # In case of partial initialization of instances.
-        pointer = getattr(self, "_pointer", None)
-        if pointer is not None:
-            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_userobject, pointer)
-
-    def _uniffi_clone_pointer(self):
-        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_userobject, self._pointer)
-
-    # Used by alternative constructors or any methods which return this type.
-    @classmethod
-    def _make_instance_(cls, pointer):
-        # Lightly yucky way to bypass the usual __init__ logic
-        # and just create a new instance with the required pointer.
-        inst = cls.__new__(cls)
-        inst._pointer = pointer
-        return inst
-
-
-    def serialize(self, ) -> "bytes":
-        return _UniffiConverterBytes.lift(
-            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_userobject_serialize,self._uniffi_clone_pointer(),)
-        )
-
-
-
-
-
-    def to_record(self, ) -> "UserRecord":
-        return _UniffiConverterTypeUserRecord.lift(
-            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_userobject_to_record,self._uniffi_clone_pointer(),)
-        )
-
-
-
-
-
-
-class _UniffiConverterTypeUserObject:
-
-    @staticmethod
-    def lift(value: int):
-        return UserObject._make_instance_(value)
-
-    @staticmethod
-    def check_lower(value: UserObject):
-        if not isinstance(value, UserObject):
-            raise TypeError("Expected UserObject instance, {} found".format(type(value).__name__))
-
-    @staticmethod
-    def lower(value: UserObjectProtocol):
-        if not isinstance(value, UserObject):
-            raise TypeError("Expected UserObject instance, {} found".format(type(value).__name__))
-        return value._uniffi_clone_pointer()
-
-    @classmethod
-    def read(cls, buf: _UniffiRustBuffer):
-        ptr = buf.read_u64()
-        if ptr == 0:
-            raise InternalError("Raw pointer value was null")
-        return cls.lift(ptr)
-
-    @classmethod
-    def write(cls, value: UserObjectProtocol, buf: _UniffiRustBuffer):
-        buf.write_u64(cls.lower(value))
 
 
 class FalconKeyPair:
@@ -1791,6 +1483,318 @@ class _UniffiConverterSequenceString(_UniffiConverterRustBuffer):
         return [
             _UniffiConverterString.read(buf) for i in range(count)
         ]
+
+# objects.
+class AsyncAdderProtocol(typing.Protocol):
+    def add_async(self, a: "int",b: "int"):
+        raise NotImplementedError
+# AsyncAdder is a foreign trait so treated like a callback interface, where the
+# primary use-case is the trait being implemented locally.
+# It is a base-class local implementations might subclass.
+
+
+class AsyncAdder():
+    def add_async(self, a: "int",b: "int"):
+        raise NotImplementedError
+# `AsyncAdderImpl` is the implementation for a Rust implemented version.
+class AsyncAdderImpl():
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_asyncadder, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_asyncadder, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+    async def add_async(self, a: "int",b: "int") -> "int":
+        _UniffiConverterUInt64.check_lower(a)
+        
+        _UniffiConverterUInt64.check_lower(b)
+        
+        return await _uniffi_rust_call_async(
+            _UniffiLib.uniffi_playground_fn_method_asyncadder_add_async(
+                self._uniffi_clone_pointer(), 
+        _UniffiConverterUInt64.lower(a),
+        _UniffiConverterUInt64.lower(b)
+            ),
+            _UniffiLib.ffi_playground_rust_future_poll_u64,
+            _UniffiLib.ffi_playground_rust_future_complete_u64,
+            _UniffiLib.ffi_playground_rust_future_free_u64,
+            # lift function
+            _UniffiConverterUInt64.lift,
+            
+    # Error FFI converter
+
+    None,
+
+        )
+
+
+
+
+# Put all the bits inside a class to keep the top-level namespace clean
+class _UniffiTraitImplAsyncAdder:
+    # For each method, generate a callback function to pass to Rust
+
+    @_UNIFFI_CALLBACK_INTERFACE_ASYNC_ADDER_METHOD0
+    def add_async(
+            uniffi_handle,
+            a,
+            b,
+            uniffi_future_callback,
+            uniffi_callback_data,
+            uniffi_out_return,
+        ):
+        uniffi_obj = _UniffiConverterTypeAsyncAdder._handle_map.get(uniffi_handle)
+        def make_call():
+            args = (_UniffiConverterUInt64.lift(a), _UniffiConverterUInt64.lift(b), )
+            method = uniffi_obj.add_async
+            return method(*args)
+
+        
+        def handle_success(return_value):
+            uniffi_future_callback(
+                uniffi_callback_data,
+                _UniffiForeignFutureStructU64(
+                    _UniffiConverterUInt64.lower(return_value),
+                    _UniffiRustCallStatus.default()
+                )
+            )
+
+        def handle_error(status_code, rust_buffer):
+            uniffi_future_callback(
+                uniffi_callback_data,
+                _UniffiForeignFutureStructU64(
+                    0,
+                    _UniffiRustCallStatus(status_code, rust_buffer),
+                )
+            )
+        uniffi_out_return[0] = _uniffi_trait_interface_call_async(make_call, handle_success, handle_error)
+
+    @_UNIFFI_CALLBACK_INTERFACE_FREE
+    def _uniffi_free(uniffi_handle):
+        _UniffiConverterTypeAsyncAdder._handle_map.remove(uniffi_handle)
+
+    # Generate the FFI VTable.  This has a field for each callback interface method.
+    _uniffi_vtable = _UniffiVTableCallbackInterfaceAsyncAdder(
+        add_async,
+        _uniffi_free
+    )
+    # Send Rust a pointer to the VTable.  Note: this means we need to keep the struct alive forever,
+    # or else bad things will happen when Rust tries to access it.
+    _UniffiLib.uniffi_playground_fn_init_callback_vtable_asyncadder(ctypes.byref(_uniffi_vtable))
+
+
+
+class _UniffiConverterTypeAsyncAdder:
+    _handle_map = _UniffiHandleMap()
+
+    @staticmethod
+    def lift(value: int):
+        return AsyncAdderImpl._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: AsyncAdder):
+        pass
+
+    @staticmethod
+    def lower(value: AsyncAdderProtocol):
+        return _UniffiConverterTypeAsyncAdder._handle_map.insert(value)
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: AsyncAdderProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+class FavoriteNumbersProtocol(typing.Protocol):
+    def add_number(self, number: "int"):
+        raise NotImplementedError
+    def find_min(self, ):
+        raise NotImplementedError
+    def quick_sort(self, numbers: "typing.Optional[typing.List[int]]"):
+        raise NotImplementedError
+# FavoriteNumbers is a Rust-only trait - it's a wrapper around a Rust implementation.
+class FavoriteNumbers():
+    _pointer: ctypes.c_void_p
+    def __init__(self, ):
+        self._pointer = _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_constructor_favoritenumbers_new,)
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_favoritenumbers, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_favoritenumbers, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def add_number(self, number: "int") -> None:
+        _UniffiConverterUInt64.check_lower(number)
+        
+        _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_add_number,self._uniffi_clone_pointer(),
+        _UniffiConverterUInt64.lower(number))
+
+
+
+
+
+
+    def find_min(self, ) -> "int":
+        return _UniffiConverterUInt64.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_find_min,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+    def quick_sort(self, numbers: "typing.Optional[typing.List[int]]") -> "typing.List[int]":
+        _UniffiConverterOptionalSequenceUInt64.check_lower(numbers)
+        
+        return _UniffiConverterSequenceUInt64.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort,self._uniffi_clone_pointer(),
+        _UniffiConverterOptionalSequenceUInt64.lower(numbers))
+        )
+
+
+
+
+
+
+class _UniffiConverterTypeFavoriteNumbers:
+
+    @staticmethod
+    def lift(value: int):
+        return FavoriteNumbers._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: FavoriteNumbers):
+        if not isinstance(value, FavoriteNumbers):
+            raise TypeError("Expected FavoriteNumbers instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: FavoriteNumbersProtocol):
+        if not isinstance(value, FavoriteNumbers):
+            raise TypeError("Expected FavoriteNumbers instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: FavoriteNumbersProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+class UserObjectProtocol(typing.Protocol):
+    def serialize(self, ):
+        raise NotImplementedError
+    def to_record(self, ):
+        raise NotImplementedError
+# UserObject is a Rust-only trait - it's a wrapper around a Rust implementation.
+class UserObject():
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_userobject, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_userobject, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def serialize(self, ) -> "bytes":
+        return _UniffiConverterBytes.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_userobject_serialize,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+    def to_record(self, ) -> "UserRecord":
+        return _UniffiConverterTypeUserRecord.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_userobject_to_record,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+
+class _UniffiConverterTypeUserObject:
+
+    @staticmethod
+    def lift(value: int):
+        return UserObject._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: UserObject):
+        if not isinstance(value, UserObject):
+            raise TypeError("Expected UserObject instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: UserObjectProtocol):
+        if not isinstance(value, UserObject):
+            raise TypeError("Expected UserObject instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: UserObjectProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
 
 # Async support# RustFuturePoll values
 _UNIFFI_RUST_FUTURE_POLL_READY = 0

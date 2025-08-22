@@ -10,7 +10,7 @@ crate-type = ["lib", "cdylib"]
 name = "playground"
 
 [dependencies]
-uniffi = { version = "0.28.3", features=["scaffolding-ffi-buffer-fns", "cli", "tokio"] }
+uniffi = { version = "0.29.4", features=["scaffolding-ffi-buffer-fns", "cli", "tokio"] }
 wasm-bindgen = "0.2.97"
 wasm-bindgen-futures = "0.4.47"
 thiserror = "1.0"
@@ -40,10 +40,10 @@ wasm32-unknown-unknown-openbsd-libc = "0.2"
 bindgen = "0.70.1"
 cc = "1.2.2"
 # Add the "scaffolding-ffi-buffer-fns" feature to make sure things can build correctly
-uniffi = { version = "0.28.3", features = ["build", "scaffolding-ffi-buffer-fns"] }
+uniffi = { version = "0.29.4", features = ["build", "scaffolding-ffi-buffer-fns"] }
 
 [dev-dependencies]
-uniffi = { version = "0.28.3" }
+uniffi = { version = "0.29.4" }
 
 [[bin]]
 # This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
