@@ -361,6 +361,11 @@ pub fn wasm_user_object_from_record(record: UserRecord) -> WasmUserObject {
 
 #[uniffi::export(with_foreign)]
 #[async_trait]
-trait AsyncAdder: Send + Sync {
+pub trait AsyncAdder: Send + Sync {
     async fn add_async(&self, a: u64, b: u64) -> u64;
+}
+
+#[uniffi::export]
+pub async fn call_async_adder(adder: &dyn AsyncAdder, a: u64, b: u64) -> u64 {
+    adder.add_async(a, b).await
 }

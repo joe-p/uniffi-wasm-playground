@@ -463,6 +463,8 @@ def _uniffi_check_contract_api_version(lib):
 def _uniffi_check_api_checksums(lib):
     if lib.uniffi_playground_checksum_func_add() != 18524:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_call_async_adder() != 4106:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_div() != 64870:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_equal() != 8990:
@@ -685,6 +687,12 @@ _UniffiLib.uniffi_playground_fn_func_add.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_playground_fn_func_add.restype = ctypes.c_uint64
+_UniffiLib.uniffi_playground_fn_func_call_async_adder.argtypes = (
+    ctypes.c_void_p,
+    ctypes.c_uint64,
+    ctypes.c_uint64,
+)
+_UniffiLib.uniffi_playground_fn_func_call_async_adder.restype = ctypes.c_uint64
 _UniffiLib.uniffi_playground_fn_func_div.argtypes = (
     ctypes.c_uint64,
     ctypes.c_uint64,
@@ -1001,6 +1009,9 @@ _UniffiLib.ffi_playground_rust_future_complete_void.restype = None
 _UniffiLib.uniffi_playground_checksum_func_add.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_add.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_call_async_adder.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_call_async_adder.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_div.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_div.restype = ctypes.c_uint16
@@ -1902,6 +1913,30 @@ def add(a: "int",b: "int") -> "int":
         _UniffiConverterUInt64.lower(a),
         _UniffiConverterUInt64.lower(b)))
 
+async def call_async_adder(adder: "AsyncAdder",a: "int",b: "int") -> "int":
+
+    _UniffiConverterTypeAsyncAdder.check_lower(adder)
+    
+    _UniffiConverterUInt64.check_lower(a)
+    
+    _UniffiConverterUInt64.check_lower(b)
+    
+    return await _uniffi_rust_call_async(
+        _UniffiLib.uniffi_playground_fn_func_call_async_adder(
+        _UniffiConverterTypeAsyncAdder.lower(adder),
+        _UniffiConverterUInt64.lower(a),
+        _UniffiConverterUInt64.lower(b)),
+        _UniffiLib.ffi_playground_rust_future_poll_u64,
+        _UniffiLib.ffi_playground_rust_future_complete_u64,
+        _UniffiLib.ffi_playground_rust_future_free_u64,
+        # lift function
+        _UniffiConverterUInt64.lift,
+        
+    # Error FFI converter
+
+    None,
+
+    )
 
 def div(dividend: "int",divisor: "int") -> "int":
     _UniffiConverterUInt64.check_lower(dividend)
@@ -2001,6 +2036,7 @@ __all__ = [
     "FalconKeyPair",
     "UserRecord",
     "add",
+    "call_async_adder",
     "div",
     "equal",
     "falcon_genkey",

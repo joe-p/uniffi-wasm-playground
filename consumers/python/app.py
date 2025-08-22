@@ -1,4 +1,6 @@
 from playground import (
+    AsyncAdder,
+    call_async_adder,
     http_get,
     genkey,
     add,
@@ -188,7 +190,16 @@ def bench():
     time_it(serialize_python_class, iterations)
 
 
+class AsyncAdderImpl(AsyncAdder):
+    async def add_async(self, a: int, b: int) -> int:
+        return a + b
+
+
 async def demo():
+    res = await call_async_adder(AsyncAdderImpl(), 1, 2)
+    assert res == 3, f"Expected 3, got {res}"
+    print(f"Async adder result: {res}")
+
     # "Heavy" computation like key generation
     print("ed25519 key:", genkey())
 
