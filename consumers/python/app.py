@@ -190,13 +190,13 @@ def bench():
     time_it(serialize_python_class, iterations)
 
 
-class AsyncAdderImpl(AsyncAdder):
+class PythonAsyncAdder(AsyncAdder):
     async def add_async(self, a: int, b: int) -> int:
         return a + b
 
 
 async def demo():
-    res = await call_async_adder(AsyncAdderImpl(), 1, 2)
+    res = await call_async_adder(PythonAsyncAdder(), 1, 2)
     assert res == 3, f"Expected 3, got {res}"
     print(f"Async adder result: {res}")
 
