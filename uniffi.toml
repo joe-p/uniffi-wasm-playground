@@ -1,6 +1,6 @@
 [bindings.python.custom_types.StrOrInt]
 # Name of the type in the Kotlin code
-# type_name = "int | str"
+type_name = "TestStrOrInt"
 # Expression to convert the builtin type the custom type.  In this example, `{}` will be replaced with the int value.
 lift = "lift_int_str_union({})"
 # Expression to convert the custom type to the builtin type.  In this example, `{}` will be replaced with the URL value.
