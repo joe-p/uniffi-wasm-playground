@@ -467,6 +467,8 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_div() != 64870:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_echo_str_or_int() != 9177:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_equal() != 8990:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_falcon_genkey() != 34897:
@@ -699,6 +701,11 @@ _UniffiLib.uniffi_playground_fn_func_div.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_playground_fn_func_div.restype = ctypes.c_uint64
+_UniffiLib.uniffi_playground_fn_func_echo_str_or_int.argtypes = (
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_func_echo_str_or_int.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_playground_fn_func_equal.argtypes = (
     ctypes.c_uint64,
     ctypes.c_uint64,
@@ -1015,6 +1022,9 @@ _UniffiLib.uniffi_playground_checksum_func_call_async_adder.restype = ctypes.c_u
 _UniffiLib.uniffi_playground_checksum_func_div.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_div.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_echo_str_or_int.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_echo_str_or_int.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_equal.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_equal.restype = ctypes.c_uint16
@@ -1409,6 +1419,105 @@ class _UniffiConverterTypePlaygroundError(_UniffiConverterRustBuffer):
 
 
 
+
+
+class StrOrIntEnum:
+    def __init__(self):
+        raise RuntimeError("StrOrIntEnum cannot be instantiated directly")
+
+    # Each enum variant is a nested class of the enum itself.
+    class STR:
+        def __init__(self, *values):
+            if len(values) != 1:
+                raise TypeError(f"Expected 1 arguments, found {len(values)}")
+            self._values = values
+
+        def __getitem__(self, index):
+            return self._values[index]
+
+        def __str__(self):
+            return f"StrOrIntEnum.STR{self._values!r}"
+
+        def __eq__(self, other):
+            if not other.is_STR():
+                return False
+            return self._values == other._values
+    class INT:
+        def __init__(self, *values):
+            if len(values) != 1:
+                raise TypeError(f"Expected 1 arguments, found {len(values)}")
+            self._values = values
+
+        def __getitem__(self, index):
+            return self._values[index]
+
+        def __str__(self):
+            return f"StrOrIntEnum.INT{self._values!r}"
+
+        def __eq__(self, other):
+            if not other.is_INT():
+                return False
+            return self._values == other._values
+    
+
+    # For each variant, we have `is_NAME` and `is_name` methods for easily checking
+    # whether an instance is that variant.
+    def is_STR(self) -> bool:
+        return isinstance(self, StrOrIntEnum.STR)
+    def is_str(self) -> bool:
+        return isinstance(self, StrOrIntEnum.STR)
+    def is_INT(self) -> bool:
+        return isinstance(self, StrOrIntEnum.INT)
+    def is_int(self) -> bool:
+        return isinstance(self, StrOrIntEnum.INT)
+    
+
+# Now, a little trick - we make each nested variant class be a subclass of the main
+# enum class, so that method calls and instance checks etc will work intuitively.
+# We might be able to do this a little more neatly with a metaclass, but this'll do.
+StrOrIntEnum.STR = type("StrOrIntEnum.STR", (StrOrIntEnum.STR, StrOrIntEnum,), {})  # type: ignore
+StrOrIntEnum.INT = type("StrOrIntEnum.INT", (StrOrIntEnum.INT, StrOrIntEnum,), {})  # type: ignore
+
+
+
+
+class _UniffiConverterTypeStrOrIntEnum(_UniffiConverterRustBuffer):
+    @staticmethod
+    def read(buf):
+        variant = buf.read_i32()
+        if variant == 1:
+            return StrOrIntEnum.STR(
+                _UniffiConverterString.read(buf),
+            )
+        if variant == 2:
+            return StrOrIntEnum.INT(
+                _UniffiConverterUInt64.read(buf),
+            )
+        raise InternalError("Raw enum value doesn't match any cases")
+
+    @staticmethod
+    def check_lower(value):
+        if value.is_STR():
+            _UniffiConverterString.check_lower(value._values[0])
+            return
+        if value.is_INT():
+            _UniffiConverterUInt64.check_lower(value._values[0])
+            return
+        raise ValueError(value)
+
+    @staticmethod
+    def write(value, buf):
+        if value.is_STR():
+            buf.write_i32(1)
+            _UniffiConverterString.write(value._values[0], buf)
+        if value.is_INT():
+            buf.write_i32(2)
+            _UniffiConverterUInt64.write(value._values[0], buf)
+
+
+
+
+
 class _UniffiConverterOptionalSequenceUInt64(_UniffiConverterRustBuffer):
     @classmethod
     def check_lower(cls, value):
@@ -1483,6 +1592,33 @@ class _UniffiConverterSequenceString(_UniffiConverterRustBuffer):
         return [
             _UniffiConverterString.read(buf) for i in range(count)
         ]
+
+
+class _UniffiConverterTypeStrOrInt:
+    @staticmethod
+    def write(value, buf):
+        builtin_value = lower_int_str_union(value)
+        _UniffiConverterTypeStrOrIntEnum.write(builtin_value, buf)
+
+    @staticmethod
+    def read(buf):
+        builtin_value = _UniffiConverterTypeStrOrIntEnum.read(buf)
+        return lift_int_str_union(builtin_value)
+
+    @staticmethod
+    def lift(value):
+        builtin_value = _UniffiConverterTypeStrOrIntEnum.lift(value)
+        return lift_int_str_union(builtin_value)
+
+    @staticmethod
+    def check_lower(value):
+        builtin_value = lower_int_str_union(value)
+        return _UniffiConverterTypeStrOrIntEnum.check_lower(builtin_value)
+
+    @staticmethod
+    def lower(value):
+        builtin_value = lower_int_str_union(value)
+        return _UniffiConverterTypeStrOrIntEnum.lower(builtin_value)
 
 # objects.
 class AsyncAdderProtocol(typing.Protocol):
@@ -1795,6 +1931,7 @@ class _UniffiConverterTypeUserObject:
     @classmethod
     def write(cls, value: UserObjectProtocol, buf: _UniffiRustBuffer):
         buf.write_u64(cls.lower(value))
+StrOrInt = StrOrIntEnum
 
 # Async support# RustFuturePoll values
 _UNIFFI_RUST_FUTURE_POLL_READY = 0
@@ -1952,6 +2089,13 @@ def div(dividend: "int",divisor: "int") -> "int":
         _UniffiConverterUInt64.lower(divisor)))
 
 
+def echo_str_or_int(value: "StrOrInt") -> "StrOrInt":
+    _UniffiConverterTypeStrOrInt.check_lower(value)
+    
+    return _UniffiConverterTypeStrOrInt.lift(_uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_echo_str_or_int,
+        _UniffiConverterTypeStrOrInt.lower(value)))
+
+
 def equal(a: "int",b: "int") -> "bool":
     _UniffiConverterUInt64.check_lower(a)
     
@@ -2037,11 +2181,13 @@ __all__ = [
     "InternalError",
     "FalconError",
     "PlaygroundError",
+    "StrOrIntEnum",
     "FalconKeyPair",
     "UserRecord",
     "add",
     "call_async_adder",
     "div",
+    "echo_str_or_int",
     "equal",
     "falcon_genkey",
     "genkey",

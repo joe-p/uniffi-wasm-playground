@@ -369,3 +369,18 @@ pub trait AsyncAdder: Send + Sync {
 pub async fn call_async_adder(adder: &dyn AsyncAdder, a: u64, b: u64) -> u64 {
     adder.add_async(a, b).await
 }
+
+#[derive(uniffi::Enum)]
+pub enum StrOrIntEnum {
+    Str(String),
+    Int(u64),
+}
+
+pub struct StrOrInt(StrOrIntEnum);
+
+uniffi::custom_newtype!(StrOrInt, StrOrIntEnum);
+
+#[uniffi::export]
+pub fn echo_str_or_int(value: StrOrInt) -> StrOrInt {
+    value
+}

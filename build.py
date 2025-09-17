@@ -63,7 +63,7 @@ else:
 
 if build_mode == "py":
     run(
-        "cargo --color always run --bin uniffi-bindgen generate --library target/release/libplayground.dylib --language python --out-dir consumers/python"
+        "cargo --color always run --bin uniffi-bindgen generate --library target/release/libplayground.dylib --language python --out-dir consumers/python --config uniffi.toml"
     )
 
     extension = None
