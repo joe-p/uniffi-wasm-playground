@@ -12,6 +12,7 @@ from playground import (
     UserRecord,
     user_object_from_record,
     no_op,
+    echo_str_or_int
 )
 import asyncio
 import json
@@ -240,8 +241,12 @@ async def demo():
 
 
 async def main():
-    await demo()
-    bench()
+    assert echo_str_or_int("hello") == "hello"
+    assert echo_str_or_int(123) == 123
+    print(echo_str_or_int("hello world!"))
+
+    # await demo()
+    # bench()
 
 
 if __name__ == "__main__":
