@@ -471,11 +471,19 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_falcon_genkey() != 34897:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_foo() != 44595:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_foreign_say_hello() != 33212:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_genkey() != 22160:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_http_get() != 48812:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_make_struct() != 45845:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_no_op() != 57756:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_func_non_foreign_say_hello() != 64670:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_func_say_after() != 4073:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
@@ -491,11 +499,27 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_favoritenumbers_quick_sort() != 8953:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_foreignhelloobj_hello() != 16909:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_foreignhellotrait_hello() != 44073:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_mystruct_my_method() != 58042:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_mytrait_my_method() != 46779:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_nonforeignhelloobj_hello() != 39262:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_method_nonforeignhellotrait_hello() != 43308:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_userobject_serialize() != 17774:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_method_userobject_to_record() != 62864:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_playground_checksum_constructor_favoritenumbers_new() != 62699:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_constructor_foreignhelloobj_new() != 22904:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_playground_checksum_constructor_nonforeignhelloobj_new() != 24786:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
 
 # A ctypes library to expose the extern-C FFI definitions.
@@ -605,9 +629,33 @@ _UNIFFI_FOREIGN_FUTURE_COMPLETE_VOID = ctypes.CFUNCTYPE(None,ctypes.c_uint64,_Un
 )
 _UNIFFI_CALLBACK_INTERFACE_ASYNC_ADDER_METHOD0 = ctypes.CFUNCTYPE(None,ctypes.c_uint64,ctypes.c_uint64,ctypes.c_uint64,_UNIFFI_FOREIGN_FUTURE_COMPLETE_U64,ctypes.c_uint64,ctypes.POINTER(_UniffiForeignFuture),
 )
+_UNIFFI_CALLBACK_INTERFACE_FOREIGN_HELLO_TRAIT_METHOD0 = ctypes.CFUNCTYPE(None,ctypes.c_uint64,ctypes.POINTER(_UniffiRustBuffer),
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UNIFFI_CALLBACK_INTERFACE_MY_TRAIT_METHOD0 = ctypes.CFUNCTYPE(None,ctypes.c_uint64,ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UNIFFI_CALLBACK_INTERFACE_NON_FOREIGN_HELLO_TRAIT_METHOD0 = ctypes.CFUNCTYPE(None,ctypes.c_uint64,ctypes.POINTER(_UniffiRustBuffer),
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
 class _UniffiVTableCallbackInterfaceAsyncAdder(ctypes.Structure):
     _fields_ = [
         ("add_async", _UNIFFI_CALLBACK_INTERFACE_ASYNC_ADDER_METHOD0),
+        ("uniffi_free", _UNIFFI_CALLBACK_INTERFACE_FREE),
+    ]
+class _UniffiVTableCallbackInterfaceForeignHelloTrait(ctypes.Structure):
+    _fields_ = [
+        ("hello", _UNIFFI_CALLBACK_INTERFACE_FOREIGN_HELLO_TRAIT_METHOD0),
+        ("uniffi_free", _UNIFFI_CALLBACK_INTERFACE_FREE),
+    ]
+class _UniffiVTableCallbackInterfaceMyTrait(ctypes.Structure):
+    _fields_ = [
+        ("my_method", _UNIFFI_CALLBACK_INTERFACE_MY_TRAIT_METHOD0),
+        ("uniffi_free", _UNIFFI_CALLBACK_INTERFACE_FREE),
+    ]
+class _UniffiVTableCallbackInterfaceNonForeignHelloTrait(ctypes.Structure):
+    _fields_ = [
+        ("hello", _UNIFFI_CALLBACK_INTERFACE_NON_FOREIGN_HELLO_TRAIT_METHOD0),
         ("uniffi_free", _UNIFFI_CALLBACK_INTERFACE_FREE),
     ]
 _UniffiLib.uniffi_playground_fn_clone_asyncadder.argtypes = (
@@ -661,6 +709,112 @@ _UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_playground_fn_method_favoritenumbers_quick_sort.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_playground_fn_clone_foreignhelloobj.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_foreignhelloobj.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_foreignhelloobj.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_foreignhelloobj.restype = None
+_UniffiLib.uniffi_playground_fn_constructor_foreignhelloobj_new.argtypes = (
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_constructor_foreignhelloobj_new.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_method_foreignhelloobj_hello.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_foreignhelloobj_hello.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_playground_fn_clone_foreignhellotrait.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_foreignhellotrait.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_foreignhellotrait.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_foreignhellotrait.restype = None
+_UniffiLib.uniffi_playground_fn_init_callback_vtable_foreignhellotrait.argtypes = (
+    ctypes.POINTER(_UniffiVTableCallbackInterfaceForeignHelloTrait),
+)
+_UniffiLib.uniffi_playground_fn_init_callback_vtable_foreignhellotrait.restype = None
+_UniffiLib.uniffi_playground_fn_method_foreignhellotrait_hello.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_foreignhellotrait_hello.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_playground_fn_clone_mystruct.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_mystruct.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_mystruct.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_mystruct.restype = None
+_UniffiLib.uniffi_playground_fn_method_mystruct_my_method.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_mystruct_my_method.restype = None
+_UniffiLib.uniffi_playground_fn_clone_mytrait.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_mytrait.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_mytrait.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_mytrait.restype = None
+_UniffiLib.uniffi_playground_fn_init_callback_vtable_mytrait.argtypes = (
+    ctypes.POINTER(_UniffiVTableCallbackInterfaceMyTrait),
+)
+_UniffiLib.uniffi_playground_fn_init_callback_vtable_mytrait.restype = None
+_UniffiLib.uniffi_playground_fn_method_mytrait_my_method.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_mytrait_my_method.restype = None
+_UniffiLib.uniffi_playground_fn_clone_nonforeignhelloobj.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_nonforeignhelloobj.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_nonforeignhelloobj.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_nonforeignhelloobj.restype = None
+_UniffiLib.uniffi_playground_fn_constructor_nonforeignhelloobj_new.argtypes = (
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_constructor_nonforeignhelloobj_new.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_method_nonforeignhelloobj_hello.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_nonforeignhelloobj_hello.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_playground_fn_clone_nonforeignhellotrait.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_clone_nonforeignhellotrait.restype = ctypes.c_void_p
+_UniffiLib.uniffi_playground_fn_free_nonforeignhellotrait.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_free_nonforeignhellotrait.restype = None
+_UniffiLib.uniffi_playground_fn_method_nonforeignhellotrait_hello.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_method_nonforeignhellotrait_hello.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_playground_fn_clone_userobject.argtypes = (
     ctypes.c_void_p,
     ctypes.POINTER(_UniffiRustCallStatus),
@@ -710,6 +864,16 @@ _UniffiLib.uniffi_playground_fn_func_falcon_genkey.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_playground_fn_func_falcon_genkey.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_playground_fn_func_foo.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_func_foo.restype = None
+_UniffiLib.uniffi_playground_fn_func_foreign_say_hello.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_func_foreign_say_hello.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_playground_fn_func_genkey.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
@@ -718,10 +882,19 @@ _UniffiLib.uniffi_playground_fn_func_http_get.argtypes = (
     _UniffiRustBuffer,
 )
 _UniffiLib.uniffi_playground_fn_func_http_get.restype = ctypes.c_uint64
+_UniffiLib.uniffi_playground_fn_func_make_struct.argtypes = (
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_func_make_struct.restype = ctypes.c_void_p
 _UniffiLib.uniffi_playground_fn_func_no_op.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_playground_fn_func_no_op.restype = None
+_UniffiLib.uniffi_playground_fn_func_non_foreign_say_hello.argtypes = (
+    ctypes.c_void_p,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_playground_fn_func_non_foreign_say_hello.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_playground_fn_func_say_after.argtypes = (
     ctypes.c_uint64,
     _UniffiRustBuffer,
@@ -1021,15 +1194,27 @@ _UniffiLib.uniffi_playground_checksum_func_equal.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_falcon_genkey.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_falcon_genkey.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_foo.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_foo.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_foreign_say_hello.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_foreign_say_hello.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_genkey.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_genkey.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_http_get.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_http_get.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_make_struct.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_make_struct.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_no_op.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_no_op.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_func_non_foreign_say_hello.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_func_non_foreign_say_hello.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_func_say_after.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_func_say_after.restype = ctypes.c_uint16
@@ -1051,6 +1236,24 @@ _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_find_min.restype = 
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_quick_sort.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_method_favoritenumbers_quick_sort.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_foreignhelloobj_hello.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_foreignhelloobj_hello.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_foreignhellotrait_hello.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_foreignhellotrait_hello.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_mystruct_my_method.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_mystruct_my_method.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_mytrait_my_method.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_mytrait_my_method.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_nonforeignhelloobj_hello.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_nonforeignhelloobj_hello.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_method_nonforeignhellotrait_hello.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_method_nonforeignhellotrait_hello.restype = ctypes.c_uint16
 _UniffiLib.uniffi_playground_checksum_method_userobject_serialize.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_method_userobject_serialize.restype = ctypes.c_uint16
@@ -1060,6 +1263,12 @@ _UniffiLib.uniffi_playground_checksum_method_userobject_to_record.restype = ctyp
 _UniffiLib.uniffi_playground_checksum_constructor_favoritenumbers_new.argtypes = (
 )
 _UniffiLib.uniffi_playground_checksum_constructor_favoritenumbers_new.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_constructor_foreignhelloobj_new.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_constructor_foreignhelloobj_new.restype = ctypes.c_uint16
+_UniffiLib.uniffi_playground_checksum_constructor_nonforeignhelloobj_new.argtypes = (
+)
+_UniffiLib.uniffi_playground_checksum_constructor_nonforeignhelloobj_new.restype = ctypes.c_uint16
 _UniffiLib.ffi_playground_uniffi_contract_version.argtypes = (
 )
 _UniffiLib.ffi_playground_uniffi_contract_version.restype = ctypes.c_uint32
@@ -1199,6 +1408,18 @@ class _UniffiConverterBytes(_UniffiConverterRustBuffer):
     def write(value, buf):
         buf.write_i32(len(value))
         buf.write(value)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1626,6 +1847,292 @@ class _UniffiConverterTypeAsyncAdder:
     @classmethod
     def write(cls, value: AsyncAdderProtocol, buf: _UniffiRustBuffer):
         buf.write_u64(cls.lower(value))
+class ForeignHelloTraitProtocol(typing.Protocol):
+    def hello(self, ):
+        raise NotImplementedError
+# ForeignHelloTrait is a foreign trait so treated like a callback interface, where the
+# primary use-case is the trait being implemented locally.
+# It is a base-class local implementations might subclass.
+
+
+class ForeignHelloTrait():
+    def hello(self, ):
+        raise NotImplementedError
+# `ForeignHelloTraitImpl` is the implementation for a Rust implemented version.
+class ForeignHelloTraitImpl():
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_foreignhellotrait, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_foreignhellotrait, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def hello(self, ) -> "str":
+        return _UniffiConverterString.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_foreignhellotrait_hello,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+# Put all the bits inside a class to keep the top-level namespace clean
+class _UniffiTraitImplForeignHelloTrait:
+    # For each method, generate a callback function to pass to Rust
+
+    @_UNIFFI_CALLBACK_INTERFACE_FOREIGN_HELLO_TRAIT_METHOD0
+    def hello(
+            uniffi_handle,
+            uniffi_out_return,
+            uniffi_call_status_ptr,
+        ):
+        uniffi_obj = _UniffiConverterTypeForeignHelloTrait._handle_map.get(uniffi_handle)
+        def make_call():
+            args = ()
+            method = uniffi_obj.hello
+            return method(*args)
+
+        
+        def write_return_value(v):
+            uniffi_out_return[0] = _UniffiConverterString.lower(v)
+        _uniffi_trait_interface_call(
+                uniffi_call_status_ptr.contents,
+                make_call,
+                write_return_value,
+        )
+
+    @_UNIFFI_CALLBACK_INTERFACE_FREE
+    def _uniffi_free(uniffi_handle):
+        _UniffiConverterTypeForeignHelloTrait._handle_map.remove(uniffi_handle)
+
+    # Generate the FFI VTable.  This has a field for each callback interface method.
+    _uniffi_vtable = _UniffiVTableCallbackInterfaceForeignHelloTrait(
+        hello,
+        _uniffi_free
+    )
+    # Send Rust a pointer to the VTable.  Note: this means we need to keep the struct alive forever,
+    # or else bad things will happen when Rust tries to access it.
+    _UniffiLib.uniffi_playground_fn_init_callback_vtable_foreignhellotrait(ctypes.byref(_uniffi_vtable))
+
+
+
+class _UniffiConverterTypeForeignHelloTrait:
+    _handle_map = _UniffiHandleMap()
+
+    @staticmethod
+    def lift(value: int):
+        return ForeignHelloTraitImpl._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: ForeignHelloTrait):
+        pass
+
+    @staticmethod
+    def lower(value: ForeignHelloTraitProtocol):
+        return _UniffiConverterTypeForeignHelloTrait._handle_map.insert(value)
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: ForeignHelloTraitProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+class MyTraitProtocol(typing.Protocol):
+    def my_method(self, ):
+        raise NotImplementedError
+# MyTrait is a foreign trait so treated like a callback interface, where the
+# primary use-case is the trait being implemented locally.
+# It is a base-class local implementations might subclass.
+
+
+class MyTrait():
+    def my_method(self, ):
+        raise NotImplementedError
+# `MyTraitImpl` is the implementation for a Rust implemented version.
+class MyTraitImpl():
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_mytrait, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_mytrait, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def my_method(self, ) -> None:
+        _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_mytrait_my_method,self._uniffi_clone_pointer(),)
+
+
+
+
+
+
+# Put all the bits inside a class to keep the top-level namespace clean
+class _UniffiTraitImplMyTrait:
+    # For each method, generate a callback function to pass to Rust
+
+    @_UNIFFI_CALLBACK_INTERFACE_MY_TRAIT_METHOD0
+    def my_method(
+            uniffi_handle,
+            uniffi_out_return,
+            uniffi_call_status_ptr,
+        ):
+        uniffi_obj = _UniffiConverterTypeMyTrait._handle_map.get(uniffi_handle)
+        def make_call():
+            args = ()
+            method = uniffi_obj.my_method
+            return method(*args)
+
+        
+        write_return_value = lambda v: None
+        _uniffi_trait_interface_call(
+                uniffi_call_status_ptr.contents,
+                make_call,
+                write_return_value,
+        )
+
+    @_UNIFFI_CALLBACK_INTERFACE_FREE
+    def _uniffi_free(uniffi_handle):
+        _UniffiConverterTypeMyTrait._handle_map.remove(uniffi_handle)
+
+    # Generate the FFI VTable.  This has a field for each callback interface method.
+    _uniffi_vtable = _UniffiVTableCallbackInterfaceMyTrait(
+        my_method,
+        _uniffi_free
+    )
+    # Send Rust a pointer to the VTable.  Note: this means we need to keep the struct alive forever,
+    # or else bad things will happen when Rust tries to access it.
+    _UniffiLib.uniffi_playground_fn_init_callback_vtable_mytrait(ctypes.byref(_uniffi_vtable))
+
+
+
+class _UniffiConverterTypeMyTrait:
+    _handle_map = _UniffiHandleMap()
+
+    @staticmethod
+    def lift(value: int):
+        return MyTraitImpl._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: MyTrait):
+        pass
+
+    @staticmethod
+    def lower(value: MyTraitProtocol):
+        return _UniffiConverterTypeMyTrait._handle_map.insert(value)
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: MyTraitProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+class NonForeignHelloTraitProtocol(typing.Protocol):
+    def hello(self, ):
+        raise NotImplementedError
+# NonForeignHelloTrait is a Rust-only trait - it's a wrapper around a Rust implementation.
+class NonForeignHelloTrait():
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_nonforeignhellotrait, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_nonforeignhellotrait, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def hello(self, ) -> "str":
+        return _UniffiConverterString.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_nonforeignhellotrait_hello,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+
+class _UniffiConverterTypeNonForeignHelloTrait:
+
+    @staticmethod
+    def lift(value: int):
+        return NonForeignHelloTrait._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: NonForeignHelloTrait):
+        if not isinstance(value, NonForeignHelloTrait):
+            raise TypeError("Expected NonForeignHelloTrait instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: NonForeignHelloTraitProtocol):
+        if not isinstance(value, NonForeignHelloTrait):
+            raise TypeError("Expected NonForeignHelloTrait instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: NonForeignHelloTraitProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
 class FavoriteNumbersProtocol(typing.Protocol):
     def add_number(self, number: "int"):
         raise NotImplementedError
@@ -1717,6 +2224,201 @@ class _UniffiConverterTypeFavoriteNumbers:
 
     @classmethod
     def write(cls, value: FavoriteNumbersProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+class ForeignHelloObjProtocol(typing.Protocol):
+    def hello(self, ):
+        raise NotImplementedError
+# ForeignHelloObj is a Rust-only trait - it's a wrapper around a Rust implementation.
+class ForeignHelloObj(ForeignHelloTrait,):
+    _pointer: ctypes.c_void_p
+    def __init__(self, ):
+        self._pointer = _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_constructor_foreignhelloobj_new,)
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_foreignhelloobj, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_foreignhelloobj, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def hello(self, ) -> "str":
+        return _UniffiConverterString.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_foreignhelloobj_hello,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+
+class _UniffiConverterTypeForeignHelloObj:
+
+    @staticmethod
+    def lift(value: int):
+        return ForeignHelloObj._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: ForeignHelloObj):
+        if not isinstance(value, ForeignHelloObj):
+            raise TypeError("Expected ForeignHelloObj instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: ForeignHelloObjProtocol):
+        if not isinstance(value, ForeignHelloObj):
+            raise TypeError("Expected ForeignHelloObj instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: ForeignHelloObjProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+class MyStructProtocol(typing.Protocol):
+    def my_method(self, ):
+        raise NotImplementedError
+# MyStruct is a Rust-only trait - it's a wrapper around a Rust implementation.
+class MyStruct(MyTrait,):
+    _pointer: ctypes.c_void_p
+    
+    def __init__(self, *args, **kwargs):
+        raise ValueError("This class has no default constructor")
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_mystruct, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_mystruct, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def my_method(self, ) -> None:
+        _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_mystruct_my_method,self._uniffi_clone_pointer(),)
+
+
+
+
+
+
+
+class _UniffiConverterTypeMyStruct:
+
+    @staticmethod
+    def lift(value: int):
+        return MyStruct._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: MyStruct):
+        if not isinstance(value, MyStruct):
+            raise TypeError("Expected MyStruct instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: MyStructProtocol):
+        if not isinstance(value, MyStruct):
+            raise TypeError("Expected MyStruct instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: MyStructProtocol, buf: _UniffiRustBuffer):
+        buf.write_u64(cls.lower(value))
+class NonForeignHelloObjProtocol(typing.Protocol):
+    def hello(self, ):
+        raise NotImplementedError
+# NonForeignHelloObj is a Rust-only trait - it's a wrapper around a Rust implementation.
+class NonForeignHelloObj(NonForeignHelloTrait,):
+    _pointer: ctypes.c_void_p
+    def __init__(self, ):
+        self._pointer = _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_constructor_nonforeignhelloobj_new,)
+
+    def __del__(self):
+        # In case of partial initialization of instances.
+        pointer = getattr(self, "_pointer", None)
+        if pointer is not None:
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_free_nonforeignhelloobj, pointer)
+
+    def _uniffi_clone_pointer(self):
+        return _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_clone_nonforeignhelloobj, self._pointer)
+
+    # Used by alternative constructors or any methods which return this type.
+    @classmethod
+    def _make_instance_(cls, pointer):
+        # Lightly yucky way to bypass the usual __init__ logic
+        # and just create a new instance with the required pointer.
+        inst = cls.__new__(cls)
+        inst._pointer = pointer
+        return inst
+
+
+    def hello(self, ) -> "str":
+        return _UniffiConverterString.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_method_nonforeignhelloobj_hello,self._uniffi_clone_pointer(),)
+        )
+
+
+
+
+
+
+class _UniffiConverterTypeNonForeignHelloObj:
+
+    @staticmethod
+    def lift(value: int):
+        return NonForeignHelloObj._make_instance_(value)
+
+    @staticmethod
+    def check_lower(value: NonForeignHelloObj):
+        if not isinstance(value, NonForeignHelloObj):
+            raise TypeError("Expected NonForeignHelloObj instance, {} found".format(type(value).__name__))
+
+    @staticmethod
+    def lower(value: NonForeignHelloObjProtocol):
+        if not isinstance(value, NonForeignHelloObj):
+            raise TypeError("Expected NonForeignHelloObj instance, {} found".format(type(value).__name__))
+        return value._uniffi_clone_pointer()
+
+    @classmethod
+    def read(cls, buf: _UniffiRustBuffer):
+        ptr = buf.read_u64()
+        if ptr == 0:
+            raise InternalError("Raw pointer value was null")
+        return cls.lift(ptr)
+
+    @classmethod
+    def write(cls, value: NonForeignHelloObjProtocol, buf: _UniffiRustBuffer):
         buf.write_u64(cls.lower(value))
 class UserObjectProtocol(typing.Protocol):
     def serialize(self, ):
@@ -1969,6 +2671,20 @@ def falcon_genkey(seed: "bytes") -> "FalconKeyPair":
         _UniffiConverterBytes.lower(seed)))
 
 
+def foo(x: "MyTrait") -> None:
+    _UniffiConverterTypeMyTrait.check_lower(x)
+    
+    _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_foo,
+        _UniffiConverterTypeMyTrait.lower(x))
+
+
+def foreign_say_hello(obj: "ForeignHelloTrait") -> "str":
+    _UniffiConverterTypeForeignHelloTrait.check_lower(obj)
+    
+    return _UniffiConverterString.lift(_uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_foreign_say_hello,
+        _UniffiConverterTypeForeignHelloTrait.lower(obj)))
+
+
 def genkey() -> "bytes":
     return _UniffiConverterBytes.lift(_uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_genkey,))
 
@@ -1991,8 +2707,19 @@ async def http_get(url: "str") -> "str":
 
     )
 
+def make_struct() -> "MyStruct":
+    return _UniffiConverterTypeMyStruct.lift(_uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_make_struct,))
+
+
 def no_op() -> None:
     _uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_no_op,)
+
+
+def non_foreign_say_hello(obj: "NonForeignHelloTrait") -> "str":
+    _UniffiConverterTypeNonForeignHelloTrait.check_lower(obj)
+    
+    return _UniffiConverterString.lift(_uniffi_rust_call(_UniffiLib.uniffi_playground_fn_func_non_foreign_say_hello,
+        _UniffiConverterTypeNonForeignHelloTrait.lower(obj)))
 
 async def say_after(ms: "int",who: "str") -> "str":
 
@@ -2044,14 +2771,24 @@ __all__ = [
     "div",
     "equal",
     "falcon_genkey",
+    "foo",
+    "foreign_say_hello",
     "genkey",
     "http_get",
+    "make_struct",
     "no_op",
+    "non_foreign_say_hello",
     "say_after",
     "sub",
     "user_object_from_record",
     "AsyncAdder",
     "FavoriteNumbers",
+    "ForeignHelloObj",
+    "ForeignHelloTrait",
+    "MyStruct",
+    "MyTrait",
+    "NonForeignHelloObj",
+    "NonForeignHelloTrait",
     "UserObject",
 ]
 

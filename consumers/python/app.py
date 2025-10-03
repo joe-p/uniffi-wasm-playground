@@ -1,6 +1,10 @@
 from playground import (
     AsyncAdder,
+    ForeignHelloObj,
+    NonForeignHelloObj,
     call_async_adder,
+    foo,
+    foreign_say_hello,
     http_get,
     genkey,
     add,
@@ -10,6 +14,8 @@ from playground import (
     falcon_genkey,
     FavoriteNumbers,
     UserRecord,
+    make_struct,
+    non_foreign_say_hello,
     user_object_from_record,
     no_op,
 )
@@ -240,9 +246,20 @@ async def demo():
 
 
 async def main():
-    await demo()
-    bench()
 
+    # NonForeign == segfault
+    # nf = NonForeignHelloObj()
+    # print(non_foreign_say_hello(nf))
+
+    fo = ForeignHelloObj()
+    print(foreign_say_hello(fo))
+
+    my_struct = make_struct()
+    foo(my_struct)
+
+    # await demo()
+    # bench()
+    #
 
 if __name__ == "__main__":
     asyncio.run(main())

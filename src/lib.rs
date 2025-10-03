@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::ffi::c_void;
 use std::future::pending;
 use std::sync::atomic::AtomicU64;
+use std::sync::Arc;
 use std::time::Duration;
 use tokio::time::timeout;
 use tsify_next::Tsify;
@@ -368,4 +369,93 @@ pub trait AsyncAdder: Send + Sync {
 #[uniffi::export]
 pub async fn call_async_adder(adder: &dyn AsyncAdder, a: u64, b: u64) -> u64 {
     adder.add_async(a, b).await
+}
+
+// Non-foreign trait: segfaults
+
+#[uniffi::export]
+pub trait NonForeignHelloTrait: Send + Sync {
+    fn hello(&self) -> String;
+}
+
+#[uniffi::export]
+pub fn non_foreign_say_hello(obj: Arc<dyn NonForeignHelloTrait>) -> String {
+    obj.hello()
+}
+
+#[derive(uniffi::Object)]
+pub struct NonForeignHelloObj;
+
+#[uniffi::export]
+impl NonForeignHelloObj {
+    #[uniffi::constructor]
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[uniffi::export]
+impl NonForeignHelloTrait for NonForeignHelloObj {
+    fn hello(&self) -> String {
+        "Non-Foreign Hello!".to_string()
+    }
+}
+
+// Foreign trait: works
+
+#[uniffi::export(with_foreign)]
+pub trait ForeignHelloTrait: Send + Sync {
+    fn hello(&self) -> String;
+}
+
+#[uniffi::export]
+pub fn foreign_say_hello(obj: &dyn ForeignHelloTrait) -> String {
+    obj.hello()
+}
+
+#[derive(uniffi::Object)]
+pub struct ForeignHelloObj;
+
+#[uniffi::export]
+impl ForeignHelloObj {
+    #[uniffi::constructor]
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[uniffi::export]
+impl ForeignHelloTrait for ForeignHelloObj {
+    fn hello(&self) -> String {
+        "Foreign Hello!".to_string()
+    }
+}
+
+// From https://github.com/mozilla/uniffi-rs/issues/2542
+
+#[uniffi::export(with_foreign)]
+pub trait MyTrait: Send + Sync {
+    fn my_method(&self);
+}
+
+#[derive(uniffi::Object)]
+pub struct MyStruct;
+
+#[uniffi::export]
+impl MyTrait for MyStruct {
+    fn my_method(&self) {
+        println!("MyStruct::my_method called");
+    }
+}
+
+#[uniffi::export]
+pub fn foo(x: &dyn MyTrait) {
+    x.my_method();
+}
+
+#[uniffi::export]
+pub fn make_struct() -> MyStruct {
+    MyStruct
 }
